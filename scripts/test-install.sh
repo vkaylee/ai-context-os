@@ -40,6 +40,14 @@ SUCCESS=true
 for file in "${CHECK_FILES[@]}"; do
     if [ -f "$TEST_SANDBOX/$file" ]; then
         echo "  [OK] Found: $file"
+        
+        # Verify that root adapters are NOT pointers (except in dogfooding, which this sandbox isn't)
+        if [[ "$file" == "GEMINI.md" || "$file" == "CLAUDE.md" ]]; then
+            if grep -q "Pointer:" "$TEST_SANDBOX/$file"; then
+                echo "  [FAIL] $file is a pointer, expected real content in sandbox."
+                SUCCESS=false
+            fi
+        fi
     else
         echo "  [FAIL] Missing: $file"
         SUCCESS=false
