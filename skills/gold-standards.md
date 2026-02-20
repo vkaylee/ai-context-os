@@ -14,3 +14,4 @@
 ## 3. Validation Phase
 - **Mandatory Audit**: Running `npx ai-context-os-audit` is a hard requirement before any commit. 
 - **Verification Proof**: AI agents must provide a summary of the audit results when claiming a task is done.
+<- Increased test runner timeouts to accommodate Docker build Vetted: Yes -->

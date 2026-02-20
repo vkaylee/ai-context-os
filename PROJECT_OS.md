@@ -59,6 +59,7 @@ Before writing any code, every AI agent must:
 - **AI Interface**: Programmatic Rule. All CLI tools MUST provide a `--json` flag for machine-to-machine orchestration and a `--compress` flag for token-optimized context recovery.
 - **ULTP Protocol**: Efficiency Rule. The Ultra-Low Token Protocol (`--ultra`) is the mandatory standard for high-frequency agent signaling. If ULTP output is invalid, agents MUST fallback to `--json`.
 - **Ready Protocol**: Atomic Rule. The `--ready` flag combines ULTP (State) and Compressed MD (Logic) into a single payload for instant agent bootstrapping.
+- **Vetting Protocol**: Purity Rule. All new L2 Skills MUST be vetted against `skills/knowledge-vetting.md` and tagged with `Vetted: Yes` before commitment.
 - **Testing**: No code is committed without passing tests. If skipping new tests, a clear justification must be provided. Every change requires a full execution of the project's regression suite to ensure zero regressions. **Diamond Requirement**: Combined test coverage must exceed **90%**.
 - **Documentation**: All architectural and logic changes must be documented immediately. No documentation drift is permitted.
 

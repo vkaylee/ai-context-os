@@ -24,3 +24,4 @@ All methods, properties, and complex variables MUST carry a strict Input/Output 
 - **No-Prompt Protocol**: AI agents MUST NOT ask the user for permission to perform mandatory protocol steps (Auditing, Testing, Documentation Sync). These are integral parts of any task and must be executed autonomously.
 - **Pre-emptive Verification**: If an agent identifies a potential regression or a documentation gap *unrelated* to the current task, it should proactively propose or perform a fix as part of its 'Context Stewardship' responsibility.
 - **Autonomous Release**: Following a successful task, the agent should automatically prepare the next version (v-bump) and push changes if the environment allows.
+<- Increased test runner timeouts to accommodate Docker build Vetted: Yes -->

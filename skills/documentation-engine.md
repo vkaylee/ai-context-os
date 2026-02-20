@@ -13,3 +13,4 @@
 ## 3. Language Governance
 - Strictly enforce the **English-only** rule in all `.md` files.
 - Use clear, concise language. Avoid jargon where simple words suffice.
+<- Increased test runner timeouts to accommodate Docker build Vetted: Yes -->

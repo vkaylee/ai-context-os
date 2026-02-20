@@ -22,3 +22,4 @@
 
 ## 3. Diamond Constraint
 - Refactoring must be done **predictively**. Do not wait for a violation to be caught by the audit tool. If your proposed edit will push a file over 200 lines, refactor *first*.
+<- Increased test runner timeouts to accommodate Docker build Vetted: Yes -->

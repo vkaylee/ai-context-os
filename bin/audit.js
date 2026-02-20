@@ -27,15 +27,20 @@ export class AuditEngine {
     /**
      * @param {string} filename 
      * @param {string} content 
+     * @param {string} [filePath='']
      * @returns {boolean}
      */
-    validateFile(filename, content) {
+    validateFile(filename, content, filePath = '') {
         const lines = content.split('\n').length;
         const oErr = this.results.errors.length;
         if (!isKebabCase(filename) && !IGNORED.includes(filename)) this.results.errors.push(`Naming violation: '${filename}' must be kebab-case.`);
         if (lines > MAX_LINES) this.results.errors.push(`Modularity violation: '${filename}' has ${lines} lines (Max: ${MAX_LINES}).`);
         if (this.isDiamondMode && filename.endsWith('.md') && !isEnglishOnly(content)) {
             this.results.errors.push(`Language violation: '${filename}' contains non-English characters.`);
+            this.diamondPass = false;
+        }
+        if (this.isDiamondMode && filePath.includes('skills/') && filename.endsWith('.md') && !content.includes('Vetted:')) {
+            this.results.warnings.push(`Purity warning: Skill '${filename}' has not been vetted. Add 'Vetted: Yes' or vetting metadata.`);
             this.diamondPass = false;
         }
         return this.results.errors.length === oErr;
@@ -48,7 +53,7 @@ export class AuditEngine {
             if (IGNORED_DIRS.includes(item)) continue;
             const fullPath = path.join(dirPath, item);
             if (this.fs.statSync(fullPath).isDirectory()) this.auditDir(fullPath);
-            else this.validateFile(item, this.fs.readFileSync(fullPath, 'utf8'));
+            else this.validateFile(item, this.fs.readFileSync(fullPath, 'utf8'), fullPath);
         }
     }
 

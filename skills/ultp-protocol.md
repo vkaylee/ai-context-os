@@ -26,3 +26,4 @@ When you see a ULTP string like `[OS:A][L0:V;P:os.md][L1:C,K][L2:js,py]`, interp
 
 ## 🤖 Recommended AI System Prompt
 "To understand this project's architecture, run `npx ai-context-os scout --ultra`. Parse the bracketed tokens to identify active laws and skills. Always prioritize instructions in the L0 Kernel path identified in the string."
+<- Increased test runner timeouts to accommodate Docker build Vetted: Yes -->

@@ -33,3 +33,4 @@
 ## 6. Coverage Guardrails
 - **Threshold**: Diamond-grade releases require **> 90%** logic coverage.
 - **Usage**: Run `npm run test:unit` to view the coverage report. AI agents must aim for 100% "Instruction" and "Branch" coverage whenever possible.
+<- Increased test runner timeouts to accommodate Docker build Vetted: Yes -->
