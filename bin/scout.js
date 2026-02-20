@@ -19,21 +19,30 @@ if (isMain) {
         process.exit(0);
     }
     if (args.includes('--help') || args.includes('-h')) {
-        console.log(`Usage: npx ai-context-os scout [--json] [--compress] [--ultra]\nVisualizes the active AI Context OS environment.`);
+        console.log(`Usage: npx ai-context-os scout [--json] [--compress] [--ultra] [--ready]\nVisualizes the active AI Context OS environment.`);
         process.exit(0);
     }
 
-    const isJsonMode = args.includes('--json'), isCompressMode = args.includes('--compress'), isUltraMode = args.includes('--ultra');
+    const isJsonMode = args.includes('--json'), isCompressMode = args.includes('--compress'), isUltraMode = args.includes('--ultra'), isReadyMode = args.includes('--ready');
     const engine = new ScoutEngine(process.cwd()), osDir = engine.detectActiveOsDir();
 
-    if (isUltraMode) {
+    if (isReadyMode || isUltraMode) {
         /** @type {import('./ultp.js').ULTPState} */
         const results = {
             environment: { osRoot: osDir ? `./${osDir}/` : null, status: osDir || engine.isSourceRepo() ? 'ACTIVE' : 'NOT INSTALLED', isDogfooding: engine.isSourceRepo() },
             kernel: engine.getKernelStatus(osDir), adapters: engine.getAdapterStatus(), skills: engine.getSkills(osDir)
         };
-        console.log(ULTP.encode(results));
-        process.exit(0);
+        const ultra = ULTP.encode(results);
+        if (isUltraMode && !isReadyMode) { console.log(ultra); process.exit(0); }
+
+        if (isReadyMode) {
+            console.log(ultra);
+            console.log('---');
+            const { path: kPath, found } = engine.getKernelStatus(osDir);
+            if (found && kPath) console.log(CompressorEngine.compress(fs.readFileSync(path.join(process.cwd(), kPath), 'utf8')));
+            else console.error(`${COLORS.red}Error: Kernel not found for ready injection.${COLORS.reset}`);
+            process.exit(0);
+        }
     }
 
     if (isCompressMode) {

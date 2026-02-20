@@ -58,6 +58,7 @@ Before writing any code, every AI agent must:
 - **Fuzzing**: All CLI input parsers MUST pass a 100-cycle randomized exploratory test (Fuzzing) to ensure zero unhandled exceptions from malformed data.
 - **AI Interface**: Programmatic Rule. All CLI tools MUST provide a `--json` flag for machine-to-machine orchestration and a `--compress` flag for token-optimized context recovery.
 - **ULTP Protocol**: Efficiency Rule. The Ultra-Low Token Protocol (`--ultra`) is the mandatory standard for high-frequency agent signaling. If ULTP output is invalid, agents MUST fallback to `--json`.
+- **Ready Protocol**: Atomic Rule. The `--ready` flag combines ULTP (State) and Compressed MD (Logic) into a single payload for instant agent bootstrapping.
 - **Testing**: No code is committed without passing tests. If skipping new tests, a clear justification must be provided. Every change requires a full execution of the project's regression suite to ensure zero regressions. **Diamond Requirement**: Combined test coverage must exceed **90%**.
 - **Documentation**: All architectural and logic changes must be documented immediately. No documentation drift is permitted.
 
