@@ -11,7 +11,10 @@ import { COLORS, isKebabCase, isEnglishOnly } from './utils.js';
 
 const MAX_LINES = 200;
 const IGNORED_DIRS = ['node_modules', '.git', '.ai-context-os'];
-const IGNORED_FILES = ['package-lock.json', 'PROJECT_OS.md', 'README.md', 'CLAUDE.md', 'GEMINI.md'];
+const IGNORED_FILES = [
+    'package-lock.json', 'PROJECT_OS.md', 'README.md', 'CLAUDE.md', 'GEMINI.md', '.cursorrules',
+    'adapter-cursor.md', 'adapter-claude.md', 'adapter-gemini.md', 'utils.test.js'
+];
 
 let errorCount = 0;
 let warningCount = 0;
