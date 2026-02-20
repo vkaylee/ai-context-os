@@ -53,17 +53,28 @@ Before writing any code, every AI agent must:
 ### 3.2 File & Code Standards
 - **Modularity**: Files must not exceed **200 lines**. Refactor immediately if they do.
 - **Naming**: Use `kebab-case` for all files and directories.
-- **Language**: ALL documentation (`*.md`) must be written in **English** to ensure universal AI compatibility and minimize translation resource overhead.
+- **Language**: [UNIVERSAL COMPATIBILITY] ALL project-critical documentation (`*.md`), codebase comments, and architectural files MUST be written in **English** to ensure zero-overhead AI interpretation and global scale compatibility. **[CONVERSATIONAL PERSONA]**: While logic remains in English, AI Agents SHOULD respond to the user in their initial prompt language for collaborative fluidity.
 - **Type Safety**: Universal Rule. All functions, methods, and complex variables MUST have explicit input and output signatures. For JS/Python, use strict docstrings JSDoc `// @ts-check` or PEP 484 type hints. Zero-defect static linting is mandatory.
-- **Fuzzing**: All CLI input parsers MUST pass a 100-cycle randomized exploratory test (Fuzzing) to ensure zero unhandled exceptions from malformed data.
 - **AI Interface**: Programmatic Rule. All CLI tools MUST provide a `--json` flag for machine-to-machine orchestration and a `--compress` flag for token-optimized context recovery.
-- **ULTP Protocol**: Efficiency Rule. The Ultra-Low Token Protocol (`--ultra`) is the mandatory standard for high-frequency agent signaling. If ULTP output is invalid, agents MUST fallback to `--json`.
+- **ULTP Protocol**: Efficiency Rule. The Ultra-Low Token Protocol (`--ultra`) is the mandatory standard for high-frequency agent signaling. If ULTP output is invalid, agents MUST fallback to `--json`. **[PERSISTENCE]**: The latest ULTP state MUST be cached to `.ai-context-os/.ultp_state` for instant O(1) retrieval.
 - **Ready Protocol**: Atomic Rule. The `--ready` flag combines ULTP (State) and Compressed MD (Logic) into a single payload for instant agent bootstrapping.
 - **Vetting Protocol**: Purity Rule. All new L2 Skills MUST be vetted against `skills/knowledge-vetting.md` and tagged with `Vetted: Yes` before commitment.
+
+### 3.3 Agent Bootstrapping & Memory
+- **Bootstrapping**: [MANDATORY] Upon start, an Agent MUST execute `npx ai-context-os scout --ready` to synchronize with the current environment state.
+- **Shared Memory**: [DYNAMIC CONTEXT] Significant session actions (deployments, major refactors, test results) MUST be logged to `.ai-context-os/memory/session.md` to ensure context persistence between agents.
+
+### 3.4 Recursive Evolution Protocol (L4)
+The AI Context OS is a living system. AI Agents are granted "Legislative Rights" to evolve the OS when they encounter systemic friction.
+- **Legislative Mandate**: If an agent observes a recurring failure (>2 times across sessions, eg. a specific linting error or architectural misunderstanding), the agent MUST propose a permanent rule amendment to `PROJECT_OS.md`.
+- **Skill Discovery**: If an agent is tasked with a technology or framework not documented in the `.ai-context-os/skills/` directory, it MUST halt execution, research the official documentation, and author a new standard skill file according to the `knowledge-vetting.md` purity rules. 
+- **Execution**: The `recursive-evolution.md` skill acts as the blueprint for self-healing and capability expansion.
+
+### 3.5 Testing & Documentation
 - **Testing**: No code is committed without passing tests. If skipping new tests, a clear justification must be provided. Every change requires a full execution of the project's regression suite to ensure zero regressions. **Diamond Requirement**: Combined test coverage must exceed **90%**.
 - **Documentation**: All architectural and logic changes must be documented immediately. No documentation drift is permitted.
 
-### 3.4 Engineering Benchmarks
+### 3.6 Engineering Benchmarks
 - **🥇 Gold Standard**: Mandatory for all production features. Includes audit compliance, English docs, and modularity.
 - **💎 Diamond Standard**: The ultimate goal. Includes predictive self-healing, architectural purity, and zero technical debt. Agents are encouraged to self-elect to Diamond mode for complex refactors.
 - **Containerization**: ALL meaningful execution happens inside Docker.
@@ -76,7 +87,7 @@ Before writing any code, every AI agent must:
 
 | Agent | Responsibility | Primary Instruction File |
 | :--- | :--- | :--- |
-| **Orchestrator** | High-level planning, architecture, and alignment. | `PROJECT_OS.md` |
+| **Orchestrator** | High-level planning, evolving the OS (L4 Legislative Rights), and aligning cross-agent logic. | `PROJECT_OS.md` |
 | **Implementer** | Writing code, tests, and documentation. | `CLAUDE.md` / `.cursorrules` / `GEMINI.md` |
 | **Reviewer** | Validating against L0 standards. | `docs/review-checklist.md` |
 

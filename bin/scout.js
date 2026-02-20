@@ -30,9 +30,16 @@ if (isMain) {
         /** @type {import('./ultp.js').ULTPState} */
         const results = {
             environment: { osRoot: osDir ? `./${osDir}/` : null, status: osDir || engine.isSourceRepo() ? 'ACTIVE' : 'NOT INSTALLED', isDogfooding: engine.isSourceRepo() },
-            kernel: engine.getKernelStatus(osDir), adapters: engine.getAdapterStatus(), skills: engine.getSkills(osDir)
+            kernel: engine.getKernelStatus(osDir), adapters: engine.getAdapterStatus(), skills: engine.getSkills(osDir),
+            memory: engine.getMemoryStatus(osDir)
         };
         const ultra = ULTP.encode(results);
+        // Persistence: Cache ULTP state for instant O(1) retrieval
+        try {
+            const cacheDir = osDir ? path.join(process.cwd(), osDir) : process.cwd();
+            fs.writeFileSync(path.join(cacheDir, '.ultp_state'), ultra);
+        } catch (e) { /* silent fail on read-only environments */ }
+
         if (isUltraMode && !isReadyMode) { console.log(ultra); process.exit(0); }
 
         if (isReadyMode) {
@@ -55,7 +62,8 @@ if (isMain) {
     if (isJsonMode) {
         console.log(JSON.stringify({
             environment: { osRoot: osDir ? `./${osDir}/` : null, status: osDir || engine.isSourceRepo() ? 'ACTIVE' : 'NOT INSTALLED' },
-            kernel: engine.getKernelStatus(osDir), adapters: engine.getAdapterStatus(), skills: engine.getSkills(osDir)
+            kernel: engine.getKernelStatus(osDir), adapters: engine.getAdapterStatus(), skills: engine.getSkills(osDir),
+            memory: engine.getMemoryStatus(osDir)
         }));
         process.exit(0);
     }
@@ -81,6 +89,9 @@ if (isMain) {
 
     const skills = engine.getSkills(osDir);
     log('env', 'L2: SKILLS', skills.length ? skills.map(s => `${COLORS.green}  ★ ${s}${COLORS.reset}`).join('\n') : `  (No active skills found)`);
+
+    const mem = engine.getMemoryStatus(osDir);
+    log('env', 'L3: MEMORY', mem.found ? `${COLORS.green}  ✔ session.md found${COLORS.reset}` : `${COLORS.yellow}  - No active session log${COLORS.reset}`);
 
     console.log(`\n${COLORS.blue}Use 'audit' to verify compliance with these rules.${COLORS.reset}\n`);
 }

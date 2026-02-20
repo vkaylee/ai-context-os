@@ -19,6 +19,8 @@
  * @property {boolean} adapters.found
  * @property {string|null} adapters.pointsTo
  * @property {string[]} skills
+ * @property {Object} [memory]
+ * @property {boolean} memory.found
  */
 
 export class ULTP {
@@ -38,7 +40,8 @@ export class ULTP {
         }).filter(Boolean).sort().join(',');
 
         const skills = state.skills.sort().join(',');
-        return `[OS:${env}][L0:${kStatus};P:${kPath}][L1:${adapters}][L2:${skills}]`;
+        const mStatus = state.memory?.found ? 'V' : 'X';
+        return `[OS:${env}][L0:${kStatus};P:${kPath}][L1:${adapters}][L2:${skills}][M:${mStatus}]`;
     }
 
     /**
@@ -47,7 +50,7 @@ export class ULTP {
      * @returns {boolean}
      */
     static validate(input) {
-        const pattern = /^\[OS:[AND]\]\[L0:[VX];P:[^\]]*\]\[L1:[CKG,]*\]\[L2:[^\]]*\]$/;
+        const pattern = /^\[OS:[AND]\]\[L0:[VX];P:[^\]]*\]\[L1:[CKG,]*\]\[L2:[^\]]*\]\[M:[VX]\]$/;
         return pattern.test(input);
     }
 
@@ -73,6 +76,9 @@ export class ULTP {
 
         const skillMatch = input.match(/\[L2:([^\]]*)\]/);
         if (skillMatch) data['skills'] = skillMatch[1] ? skillMatch[1].split(',') : [];
+
+        const memoryMatch = input.match(/\[M:([VX])\]/);
+        if (memoryMatch) data['memory'] = { found: memoryMatch[1] === 'V' };
 
         return data;
     }

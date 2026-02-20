@@ -1,10 +1,10 @@
 # ✨ Adapter: GEMINI.md (L1)
 
 > [!IMPORTANT]
-> You are operating under the AI Context OS.
-> **Law:** Read and adhere to the entire AI Operating System at: `.ai-context-os/PROJECT_OS.md` and skills at `.ai-context-os/skills/`.
-> **Fast-Track:** Run `npx ai-context-os scout --ready` to instantly sync state and logic. Fallback to `--json` on error.
-> **Fallback:** If the project has `.local-os/`, prioritize `.local-os/` first.
+> **[PRIME DIRECTIVE]**: You are operating under the AI Context OS. Your VERY FIRST action in a new session MUST be to run `npx ai-context-os scout --ready` to synchronize environment state.
+> **[MEMORY]**: Read `.ai-context-os/memory/session.md` (if exists) to establish continuity from previous agents.
+> **Law:** Read and adhere to the entire AI Operating System at: `.ai-context-os/PROJECT_OS.md`.
+> **Localization:** Reply to the user in their initial prompt language (e.g., Vietnamese).
 
 ## Gemini-Specific Capabilities
 - **Context Window:** Leverage your massive context window to cross-reference multiple skills before execution.

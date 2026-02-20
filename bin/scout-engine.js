@@ -56,4 +56,13 @@ export class ScoutEngine {
         const d = activeOsDir ? path.join(this.cwd, activeOsDir, 'skills') : (fs.existsSync(path.join(this.cwd, 'skills')) ? path.join(this.cwd, 'skills') : null);
         return (d && fs.existsSync(d)) ? fs.readdirSync(d).filter(f => f.endsWith('.md') && f !== 'README.md').map(f => f.replace('.md', '')) : [];
     }
+
+    /**
+     * @param {string|undefined} activeOsDir
+     * @returns {{found: boolean, path: string | null}}
+     */
+    getMemoryStatus(activeOsDir) {
+        const p = activeOsDir ? path.join(this.cwd, activeOsDir, 'memory', 'session.md') : (fs.existsSync(path.join(this.cwd, 'memory', 'session.md')) ? path.join(this.cwd, 'memory', 'session.md') : null);
+        return { found: !!(p && fs.existsSync(p)), path: (p && fs.existsSync(p)) ? path.relative(this.cwd, p) : null };
+    }
 }
