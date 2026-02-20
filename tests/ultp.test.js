@@ -22,6 +22,7 @@ test('ULTP Engine: Encoding & Decoding', () => {
     assert.ok(ULTP.validate(encoded));
 
     const decoded = ULTP.decode(encoded);
+    assert.ok(decoded);
     assert.strictEqual(decoded.os, 'A');
     assert.strictEqual(decoded.kernel.found, true);
     assert.strictEqual(decoded.kernel.path, 'os.md');

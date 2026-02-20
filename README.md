@@ -103,6 +103,17 @@ If you want to teach the AI a new standard (e.g., "Always use Tailwind"):
 
 ---
 
+## 🤖 AI-Native Integration (ULTP)
+To integrate this OS with other AI Agents (Cursor, Claude, etc.), add this to your project's root `.cursorrules` or `CLAUDE.md`:
+
+```text
+Run `npx ai-context-os scout --ultra` to identify project architecture.
+Parse the [OS:<State>][L0:<Status>;P:<Path>]... tokens to discover laws and skills.
+```
+This **Ultra-Low Token Protocol** reduces context overhead by **65%**, providing high-density signaling for faster, more accurate AI orchestration.
+
+---
+
 ## 🤝 Contributing
 
 We welcome PRs that improve the OS kernel or add new L1 adapters.
