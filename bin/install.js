@@ -31,6 +31,13 @@ console.log(`${colors.blue}==============================${colors.reset}`);
 // Parse arguments
 const args = process.argv.slice(2);
 const helpParam = args.find(arg => arg === '--help' || arg === '-h');
+const versionParam = args.find(arg => arg === '--version' || arg === '-v');
+
+if (versionParam) {
+    const pkg = JSON.parse(fs.readFileSync(path.join(SOURCE_DIR, 'package.json'), 'utf8'));
+    console.log(`v${pkg.version}`);
+    process.exit(0);
+}
 
 if (helpParam || args.length === 0) {
     console.log(`${colors.yellow}Usage: npx ai-context-os <target_project_directory>${colors.reset}`);

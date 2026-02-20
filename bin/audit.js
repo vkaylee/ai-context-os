@@ -21,6 +21,16 @@ let warningCount = 0;
 let diamondPass = true;
 
 const isDiamondMode = process.argv.includes('--diamond');
+const isVersionMode = process.argv.includes('--version') || process.argv.includes('-v');
+
+if (isVersionMode) {
+    const __filename = path.join(process.cwd(), 'bin', 'audit.js'); // Heuristic if running locally
+    // Better way: use import.meta.url relative to package.json
+    const binDir = path.dirname(new URL(import.meta.url).pathname);
+    const pkg = JSON.parse(fs.readFileSync(path.join(binDir, '..', 'package.json'), 'utf8'));
+    console.log(`v${pkg.version}`);
+    process.exit(0);
+}
 
 function log(type, message) {
     switch (type) {

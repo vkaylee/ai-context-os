@@ -1,6 +1,6 @@
 {
   "name": "ai-context-os",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "An installable LLM Orchestrator Framework for AI Agents (Cursor, Claude, etc.)",
   "bin": {
     "ai-context-os": "bin/install.js",
@@ -33,5 +33,8 @@
   "license": "MIT",
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "ai-context-os": "^2.1.0"
   }
 }
