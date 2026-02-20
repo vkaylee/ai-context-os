@@ -33,6 +33,11 @@ This OS operates on a **Fallback Architecture (Inheritance)**. AI agents must pr
 | **L2 (Skills)** | `.ai-context-os/skills/` directory | Modular capabilities fallback (React, Rust, Python, etc.) |
 | **L3 (Docs)** | `.ai-context-os/docs/` directory | Human-readable context and decision logs. |
 
+### 2.1 Distribution Boundaries (The Sandbox)
+To maintain project integrity and recursive efficiency, we distinguish between:
+- **Shipped Zone:** Files defined in `package.json ["files"]`. These are delivered to the user via `npx`.
+- **Internal Zone (The Sandbox):** All other directories (`docs/`, `.git/`, test scripts). These are strict "Development Only" assets and must never be included in the public package. AI agents must respect this boundary when proposing file changes.
+
 ---
 
 ## 3. 🛡️ Operational Protocols (The "How")
