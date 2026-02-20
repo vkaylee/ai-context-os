@@ -159,6 +159,18 @@ function auditDiamondStandards() {
     }
 }
 
+function auditGitignore() {
+    const p = path.join(process.cwd(), '.gitignore');
+    if (!fs.existsSync(p)) return;
+    const lines = fs.readFileSync(p, 'utf8').split('\n').map(l => l.trim());
+    if (lines.some(l => l === '.local-os' || l === '.local-os/')) {
+        log('warn', "'.local-os' is in .gitignore. Team overrides won't sync.");
+    }
+    for (const f of ['.cursorrules', 'CLAUDE.md', 'GEMINI.md']) {
+        if (lines.some(l => l === f)) log('error', `Pointer '${f}' is in .gitignore. Breaks Context Engine.`);
+    }
+}
+
 // Start Audit
 console.log(`${COLORS.bold}\n====================================`);
 console.log(`  AI Context OS Audit v1.1.0 ${isDiamondMode ? '[DIAMOND MODE]' : ''} `);
@@ -166,6 +178,7 @@ console.log(`====================================${COLORS.reset}\n`);
 
 auditDir(process.cwd());
 auditPointerPattern();
+auditGitignore();
 if (isDiamondMode) auditDiamondStandards();
 
 console.log(`\n------------------------------------`);

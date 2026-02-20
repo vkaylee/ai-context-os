@@ -155,6 +155,17 @@ if (isSelfInstall) {
     console.log('  Created GEMINI.md pointer.');
 }
 
+const gitignorePath = path.join(TARGET_DIR, '.gitignore');
+if (fs.existsSync(gitignorePath)) {
+    const content = fs.readFileSync(gitignorePath, 'utf8');
+    const lines = content.split('\n').map(l => l.trim());
+    if (lines.some(l => l === '.local-os' || l === '.local-os/')) {
+        console.warn(`\n${colors.yellow}⚠️  [WARNING] '.local-os' is currently in your .gitignore!${colors.reset}`);
+        console.warn(`${colors.yellow}If you intend to share custom AI rules with your team, you MUST remove it from .gitignore.${colors.reset}`);
+        console.warn(`${colors.yellow}If this is for pure personal machine overrides, you may ignore this warning.${colors.reset}`);
+    }
+}
+
 console.log(`\n${colors.green}✅ Integration Complete!${colors.reset}`);
 console.log(`The AI Context OS has been installed in: ${OS_DIR}`);
 console.log(`\n${colors.yellow}Next Steps:${colors.reset}`);
