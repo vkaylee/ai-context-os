@@ -10,6 +10,8 @@
 ## 2. AI Execution Protocol
 - When asked to "Add feature X", the first tool call should ideally be creating or updating a test file.
 - AI agents must run tests locally before proposing any code changes to the user.
+- **Justification for Skip**: If an agent determines that new tests are not required for a change, it MUST explicitly state the reason (e.g., "Pure documentation change", "Refactor covered by existing regression suite", "Trivial string constant update").
+
 
 ## 3. High-Quality Tests
 - **Isolation**: Each test should verify a single behavior.
