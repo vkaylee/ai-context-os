@@ -3,7 +3,7 @@ import assert from 'node:assert';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { ScoutEngine } from '../bin/scout.js';
+import { ScoutEngine } from '../bin/scout-engine.js';
 import { InstallerEngine } from '../bin/install.js';
 
 const tempRoot = path.join(os.tmpdir(), `ai-os-exhaustive-${Date.now()}`);

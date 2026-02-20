@@ -83,29 +83,31 @@ if (isMain) {
         process.exit(0);
     }
     if (args.includes('--help') || args.includes('-h')) {
-        console.log(`Usage: npx ai-context-os audit [--diamond]\nEnforces architectural laws and standard compliance.`);
+        console.log(`Usage: npx ai-context-os audit [--diamond] [--json]\nEnforces architectural laws and standard compliance.`);
         process.exit(0);
     }
 
     const isDiamondMode = args.includes('--diamond');
+    const isJsonMode = args.includes('--json');
     const engine = new AuditEngine({ isDiamondMode });
     const root = process.cwd();
 
     /** @param {'error'|'warn'|'success'|'info'|'diamond'} type @param {string} msg */
     function log(type, msg) {
+        if (isJsonMode) return;
         const c = COLORS;
         const prefixes = { error: `${c.red}${c.bold}[ERROR]`, warn: `${c.yellow}${c.bold}[WARN]`, success: `${c.green}✔`, info: `${c.cyan}ℹ`, diamond: `${c.cyan}${c.bold}[DIAMOND]` };
         console[type === 'error' ? 'error' : (type === 'warn' ? 'warn' : 'log')](`${prefixes[type]}${c.reset} ${msg}`);
     }
 
-    console.log(`${COLORS.bold}\n====================================\n  AI Context OS Audit v1.2.1 ${isDiamondMode ? '[DIAMOND MODE]' : ''} \n====================================${COLORS.reset}\n`);
+    if (!isJsonMode) console.log(`${COLORS.bold}\n====================================\n  AI Context OS Audit v1.2.1 ${isDiamondMode ? '[DIAMOND MODE]' : ''} \n====================================${COLORS.reset}\n`);
 
     const errBefore = engine.results.errors.length;
     engine.auditDir(root);
     engine.results.errors.slice(errBefore).forEach(e => log('error', e));
 
     engine.auditPointers(root);
-    engine.results.successes.forEach(s => log('success', s));
+    if (!isJsonMode) engine.results.successes.forEach(s => log('success', s));
     engine.results.warnings.forEach(w => log('warn', w));
     engine.results.info.forEach(i => log('info', i));
 
@@ -121,6 +123,11 @@ if (isMain) {
         });
         log('diamond', 'Coverage Threshold: 90% Mandate active.');
         log('success', 'Logic Coverage verified (v2.13.0 Protocols).');
+    }
+
+    if (isJsonMode) {
+        console.log(JSON.stringify({ ...engine.results, diamondPass: engine.diamondPass }));
+        process.exit(engine.results.errors.length > 0 ? 1 : 0);
     }
 
     console.log(`\n------------------------------------`);
