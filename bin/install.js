@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// @ts-check
 
 /**
  * ==============================================================================
@@ -11,7 +12,10 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// Utility colors for console output
+/**
+ * Utility colors for console output
+ * @type {Object<string, string>}
+ */
 const colors = {
     reset: '\x1b[0m',
     green: '\x1b[32m',
@@ -21,11 +25,24 @@ const colors = {
     cyan: '\x1b[36m'
 };
 
+/**
+ * Encapsulates the core installation logic.
+ */
 export class InstallerEngine {
+    /**
+     * @param {string} sourceDir The absolute path to the OS source code.
+     */
     constructor(sourceDir) {
+        /** @type {string} */
         this.sourceDir = sourceDir;
     }
 
+    /**
+     * Recursively copies a directory to a new destination.
+     * @param {string} src The source directory path.
+     * @param {string} dest The destination directory path.
+     * @returns {void}
+     */
     copyDirSync(src, dest) {
         fs.mkdirSync(dest, { recursive: true });
         let entries = fs.readdirSync(src, { withFileTypes: true });
@@ -38,6 +55,11 @@ export class InstallerEngine {
         }
     }
 
+    /**
+     * Detects if the target directory is the actual source repo (dogfooding mode).
+     * @param {string} targetDir The directory being installed into.
+     * @returns {boolean} True if installing into itself, false otherwise.
+     */
     isSelfInstall(targetDir) {
         try {
             const targetPkgPath = path.join(targetDir, 'package.json');
@@ -51,6 +73,12 @@ export class InstallerEngine {
         return false;
     }
 
+    /**
+     * Executes the installation process into the target directory.
+     * @param {string} targetDir The directory to install into.
+     * @param {(msg: string) => void} [logCallback=() => {}] Optional callback for logging messages.
+     * @returns {string} The path to the created `.ai-context-os` directory.
+     */
     install(targetDir, logCallback = () => { }) {
         const osDir = path.join(targetDir, '.ai-context-os');
         fs.mkdirSync(osDir, { recursive: true });

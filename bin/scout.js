@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// @ts-check
 
 /**
  * AI Context OS - Scout
@@ -10,16 +11,31 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { COLORS } from './utils.js';
 
+/**
+ * Encapsulates the contextual visualization and detection logic for the OS.
+ */
 export class ScoutEngine {
+    /**
+     * @param {string} cwd The current working directory to analyze.
+     */
     constructor(cwd) {
+        /** @type {string} */
         this.cwd = cwd;
     }
 
+    /**
+     * Detects if the current directory contains an active OS installation.
+     * @returns {string|undefined} The name of the OS directory (e.g., '.ai-context-os'), or undefined if missing.
+     */
     detectActiveOsDir() {
         const osDirs = ['.ai-context-os', '.local-os'];
         return osDirs.find(dir => fs.existsSync(path.join(this.cwd, dir)));
     }
 
+    /**
+     * Detects if we are currently running inside the actual source repository (Dogfooding mode).
+     * @returns {boolean} True if source repo, false otherwise.
+     */
     isSourceRepo() {
         const pkgPath = path.join(this.cwd, 'package.json');
         if (!fs.existsSync(pkgPath)) return false;
@@ -30,6 +46,11 @@ export class ScoutEngine {
         }
     }
 
+    /**
+     * Analyzes the status of the L0 Kernel (PROJECT_OS.md).
+     * @param {string|undefined} activeOsDir The detected active OS directory, if any.
+     * @returns {{path: string | null, found: boolean}} The path and found status of the kernel.
+     */
     getKernelStatus(activeOsDir) {
         let kernelPath = null;
         if (activeOsDir) {
@@ -43,7 +64,19 @@ export class ScoutEngine {
         };
     }
 
+    /**
+     * @typedef {Object} AdapterStatus
+     * @property {string} name 
+     * @property {boolean} found 
+     * @property {string|null} pointsTo
+     */
+
+    /**
+     * Assesses the status of all L1 Adapters in the current context.
+     * @returns {AdapterStatus[]} The status list of adapters.
+     */
     getAdapterStatus() {
+        /** @type {string[]} */
         const adapters = ['.cursorrules', 'CLAUDE.md', 'GEMINI.md'];
         return adapters.map(a => {
             const p = path.join(this.cwd, a);
@@ -57,6 +90,11 @@ export class ScoutEngine {
         });
     }
 
+    /**
+     * Lists active L2 Skills based on the detected environment.
+     * @param {string|undefined} activeOsDir The detected active OS directory, if any.
+     * @returns {string[]} An array of skill names.
+     */
     getSkills(activeOsDir) {
         let skillsDir = null;
         if (activeOsDir) {

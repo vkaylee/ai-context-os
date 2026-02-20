@@ -14,7 +14,13 @@
 - **Deep Verification**: Validation is not just "it works". It is "it works, it's modular, it's audited, it's documented, and it's optimized for token efficiency."
 - **Immutable Kernel**: Never modify the L0 Kernel (`PROJECT_OS.md`) without a specific "Architecture Change Request" task.
 
-## 4. Proactive Autonomy
+## 4. Immutable Type Contracts 
+All methods, properties, and complex variables MUST carry a strict Input/Output signature constraint.
+- **Compiled Languages (Rust, Go, TS)**: Lean on strict compilation modes (No `any`, No unsafe blocks).
+- **Dynamic Languages (JS, Python)**: Must enforce strict type hinting (JSDoc `// @ts-check` / PEP 484).
+- **Justification**: A function without a declared signature is a black box that fundamentally breaks static analysis and AI confidence.
+
+## 5. Proactive Autonomy
 - **No-Prompt Protocol**: AI agents MUST NOT ask the user for permission to perform mandatory protocol steps (Auditing, Testing, Documentation Sync). These are integral parts of any task and must be executed autonomously.
 - **Pre-emptive Verification**: If an agent identifies a potential regression or a documentation gap *unrelated* to the current task, it should proactively propose or perform a fix as part of its 'Context Stewardship' responsibility.
 - **Autonomous Release**: Following a successful task, the agent should automatically prepare the next version (v-bump) and push changes if the environment allows.

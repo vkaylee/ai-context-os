@@ -1,3 +1,9 @@
+// @ts-check
+
+/**
+ * Console color definitions for CLI output.
+ * @type {Object<string, string>}
+ */
 export const COLORS = {
     reset: '\x1b[0m',
     red: '\x1b[31m',
@@ -10,12 +16,12 @@ export const COLORS = {
 
 /**
  * Check if a filename follows kebab-case.
+ * @param {string} filename The name of the file to check.
+ * @returns {boolean} True if the filename is kebab-case (or ignored), false otherwise.
  */
 export function isKebabCase(filename) {
     if (filename.startsWith('.') || filename.startsWith('_')) return true; // Ignore hidden files
 
-    // We parse the name without the extension
-    // Handled in caller or here? In audit.js it uses path.parse, so let's expect the full filename here or just the string.
     // Handle compound extensions like .test.js by taking everything before the first dot
     const dotIndex = filename.indexOf('.');
     const nameWithoutExt = dotIndex > 0 ? filename.substring(0, dotIndex) : filename;
@@ -25,6 +31,9 @@ export function isKebabCase(filename) {
 
 /**
  * Basic check for non-English characters in text.
+ * Used primarily to enforce English-only documentation in Diamond mode.
+ * @param {string} text The text content to analyze.
+ * @returns {boolean} True if text does not contain specific Vietnamese diacritics, false otherwise.
  */
 export function isEnglishOnly(text) {
     const vietnameseRegex = /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/gi;
