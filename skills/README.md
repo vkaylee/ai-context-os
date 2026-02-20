@@ -1,6 +1,12 @@
 # Skills Directory
 
-This directory contains modular AI capabilities (e.g., React, Python, etc.). 
-Files here are used as part of the **Fallback Architecture**. 
+This directory contains modular AI capabilities used as part of the **Fallback Architecture**. 
 
-If you want to add your own project-specific skills, you can create a `.local-os/skills/` directory in your project root, and the AI will prioritize those over the ones found here.
+### Standard Skills:
+- **gold-standards.md**: Core engineering quality benchmarks.
+- **diamond-standards.md**: High-tier autonomous perfection rules.
+- **refactoring-blueprint.md**: Strategies for maintaining 200-line modularity.
+- **test-driven-development.md**: Protocols for Test-First engineering.
+- **documentation-engine.md**: Rules for self-syncing documentation.
+
+If you want to add your own project-specific skills, create a `.local-os/skills/` directory in your project root; the AI will prioritize those.
