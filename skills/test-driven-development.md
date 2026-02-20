@@ -17,3 +17,7 @@
 - **Isolation**: Each test should verify a single behavior.
 - **Readability**: Test names should clearly state the intention (e.g., `should-return-error-when-id-is-missing`).
 - **NPS (Null, Path, State)**: Always test for null inputs, happy paths, and edge state transitions.
+
+## 4. Regression Assurance
+- **Full Suite Mandate**: After passing new tests, AI agents MUST rerun the *entire* existing test suite (e.g., `npm test`) to ensure no side effects were introduced.
+- **Verification Proof**: Completion of a task requires evidence that the full regression suite passed in the current state.
