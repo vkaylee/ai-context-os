@@ -22,6 +22,11 @@ const COMMANDS = {
         script: 'audit.js',
         usage: 'audit [--diamond]'
     },
+    'scout': {
+        description: 'Visualize active contexts, pointers, and skills',
+        script: 'scout.js',
+        usage: 'scout'
+    },
     'doctor': {
         description: 'Run system diagnostics for the OS',
         script: 'doctor.js',
