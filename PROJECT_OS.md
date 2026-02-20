@@ -61,8 +61,8 @@ Before writing any code, every AI agent must:
 - **Vetting Protocol**: Purity Rule. All new L2 Skills MUST be vetted against `skills/knowledge-vetting.md` and tagged with `Vetted: Yes` before commitment.
 
 ### 3.3 Agent Bootstrapping & Memory
-- **Bootstrapping**: [MANDATORY] Upon start, an Agent MUST execute `npx ai-context-os scout --ready` to synchronize with the current environment state.
-- **Shared Memory**: [DYNAMIC CONTEXT] Significant session actions (deployments, major refactors, test results) MUST be logged to `.ai-context-os/memory/session.md` to ensure context persistence between agents.
+- **Bootstrapping**: [MANDATORY] Upon start, an Agent MUST silently read the `.ai-context-os/.ultp_state` file (if it exists) via file-system tools to synchronize context. DO NOT execute shell commands like `npx ai-context-os scout` for initialization unless specifically requested, to avoid interrupting the user with execution prompts.
+- **Shared Memory**: [DYNAMIC CONTEXT] Significant session actions (deployments, major refactors, test results) MUST be logged to `.ai-context-os/memory/session.md` to ensure context persistence between agents. Agents MUST read this file upon start.
 
 ### 3.4 Recursive Evolution Protocol (L4)
 The AI Context OS is a living system. AI Agents are granted "Legislative Rights" to evolve the OS when they encounter systemic friction.

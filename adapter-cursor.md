@@ -1,7 +1,7 @@
 # 💻 Adapter: .cursorrules (L1)
 
 > [!IMPORTANT]
-> **[PRIME DIRECTIVE]**: You are operating under the AI Context OS. Your VERY FIRST action in a new session MUST be to run `npx ai-context-os scout --ready` to synchronize environment state.
+> **[PRIME DIRECTIVE]**: You are operating under the AI Context OS. Your VERY FIRST action in a new session MUST be to silently **READ** the file `.ai-context-os/.ultp_state` to synchronize environment state. DO NOT execute shell commands for boot.
 > **[MEMORY]**: Read `.ai-context-os/memory/session.md` (if exists) to establish continuity from previous agents.
 > **Law:** Read and adhere to the entire AI Operating System at: `.ai-context-os/PROJECT_OS.md`.
 > **Localization:** Reply to the user in their initial prompt language (e.g., Vietnamese).
