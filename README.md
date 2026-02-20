@@ -59,9 +59,9 @@ You can use the provided install script to automatically copy the core files int
 
 | Command | Action | Example |
 | :--- | :--- | :--- |
-| `npx ai-context-os install .` | Integrate OS into current project | `npx ai-context-os install .` |
-| `npx ai-context-os audit --diamond` | Run architectural compliance check | `npx ai-context-os audit --diamond` |
-| `npx ai-context-os -v` | Show current OS version | `npx ai-context-os -v` |
+| `npx ai-context-os .` | Quick Integration (Current Dir) | `npx ai-context-os .` |
+| `npx ai-context-os audit` | Check Architectural Compliance | `npx ai-context-os audit` |
+| `npx ai-context-os -v` | Show Current version | `npx ai-context-os -v` |
 
 *Why this is better:* Keeps your project root clean. You will only see `.cursorrules` and `CLAUDE.md` in your root which act as pointers to the true OS rules inside `.ai-context-os/`.
 
@@ -83,10 +83,11 @@ You can use the provided install script to automatically copy the core files int
 ## 🔄 Common Workflows
 
 ### 1. Fresh Integration
-To add the OS to a new project:
+To add the OS to a new project (Automatic mode):
 ```bash
-npx ai-context-os install .
+npx ai-context-os .
 ```
+*(Optionally use `npx ai-context-os install .` if you prefer explicit subcommands)*
 
 ### 2. Checking Compliance
 To verify if your project still adheres to the rules:
