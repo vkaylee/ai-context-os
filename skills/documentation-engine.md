@@ -3,7 +3,7 @@
 > This skill ensures that documentation is never an afterthought and stays perfectly synced with implementation.
 
 ## 1. Documentation-as-Code
-- **Sync Point**: Every significant feature change MUST be accompanied by an update to the relevant `README.md` or `docs/*.md` in the same task.
+- **Sync Point (Atomic Documentation)**: Every change to logic, structure, or protocol MUST be recorded in documentation *simultaneously* with the code change. No commit is complete without updated docs.
 - **Self-Documenting Code**: Prefer clear variable naming and small functions over heavy inline comments.
 
 ## 2. Machine-Readable Context
