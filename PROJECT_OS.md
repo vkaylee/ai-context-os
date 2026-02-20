@@ -52,6 +52,7 @@ Before writing any code, every AI agent must:
 ### 3.2 File & Code Standards
 - **Modularity**: Files must not exceed **200 lines**. Refactor immediately if they do.
 - **Naming**: Use `kebab-case` for all files and directories.
+- **Language**: ALL documentation (`*.md`) must be written in **English** to ensure universal AI compatibility and minimize translation resource overhead.
 - **Testing**: No code is committed without passing tests.
 
 ### 3.3 Tech Stack Constraints (Example)

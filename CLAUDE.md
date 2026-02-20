@@ -1,4 +1,4 @@
 # Pointer: CLAUDE.md
-Đọc và tuân thủ toàn bộ hệ điều hành AI tại: `.ai-context-os/PROJECT_OS.md` và các skills tại `.ai-context-os/skills/`.
-Nếu dự án có thư mục custom như `.local-os/`, ưu tiên sử dụng `.local-os/` trước (Fallback Architecture).
-Tham chiếu AI adapter mặc định: `.ai-context-os/CLAUDE.md`
+Read and adhere to the entire AI Operating System at: `.ai-context-os/PROJECT_OS.md` and skills at `.ai-context-os/skills/`.
+If the project has a custom directory like `.local-os/`, prioritize using `.local-os/` first (Fallback Architecture).
+Default AI adapter reference: `.ai-context-os/CLAUDE.md`
