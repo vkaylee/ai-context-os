@@ -2,118 +2,92 @@
 
 > **"Don't generate code. Orchestrate it."**
 
-## 🎯 Purpose
-
 `ai-context-os` is an **installable LLM Orchestrator Framework** designed to manage the intelligence, constraints, and context of AI Agents (Cursor, Claude, Antigravity) within any repository. It treats "AI Context" as **Infrastructure-as-Code**.
 
-This OS uses a **Fallback Architecture (Inheritance)**. Users can define their own project-specific skills and protocols, but if none exist, the AI automatically falls back to the robust, standardized `ai-context-os` core.
+## ✨ What's New in v2.20
 
-### Problem Solved
-1.  **Eliminates Overlap**: Prevents conflicting AI skills.
-2.  **Enforces SSOT**: Ensures all agents follow `PROJECT_OS.md`.
-3.  **Standardizes Interaction**: Creates a unified protocol for AI-to-System communication.
-4.  **Graceful Fallback**: Custom rules always win, but a safe standard is always there.
-
----
-
-## 🧩 How it Works: The "Pointer Architecture"
-
-The biggest challenge in AI projects is **Context Pollution** (when the AI reads too many conflicting rule files). `ai-context-os` solves this by hiding the heavy logic inside a `.ai-context-os/` directory and placing small "Pointer" files in your project root.
-
-1. **The Kernel**: All your project's rules live in `.ai-context-os/PROJECT_OS.md`.
-2. **The Pointers**: Files like `.cursorrules` or `CLAUDE.md` in your root don't contain rules themselves; they tell the AI: *"Stop! Don't look here. Go read `.ai-context-os/PROJECT_OS.md` instead."*
-3. **The Result**: Your project root stays clean, and the AI only ever has **one source of truth**.
+- **Recursive Evolution**: The OS is now "living". Agents possess Legislative Rights (L4 Protocol) to autonomously detect knowledge gaps, research new technologies, and author new standardized skills into the OS without human intervention.
+- **Silent Bootstrapping**: Zero-prompt initializations. Agents read the `.ultp_state` buffer to instantly sync environment states without running blocking shell commands.
+- **Dynamic Shared Memory**: Continuity between agent sessions through a centralized `.ai-context-os/memory/session.md` event log.
+- **Diamond Standards**: Rigorous 90% test coverage threshold and 100% Purity checks for modular capabilities.
 
 ---
 
-## 🏛️ Core Concepts (The Layers)
+## 🎯 The Problem Solved
+
+When working with Advanced Agents, context quickly degrades into a mess of conflicting rules, lost memories, and hallucinated patterns. `ai-context-os` solves this via a **Fallback Architecture (Inheritance)**.
+
+1.  **Context Hygiene**: Hides complex logic inside `.ai-context-os/` and places tiny "pointer" files (`.cursorrules`, `CLAUDE.md`) in your root.
+2.  **Enforces SSOT**: Ensures all agents fall back to the unbreakable laws in `PROJECT_OS.md` if project-specific rules fail.
+3.  **Self-Healing**: Agents detect systemic failures and literally rewrite their own context rules to prevent a recurrence.
+
+---
+
+## 🏛️ Architecture & Layers
 
 We organize intelligence into four distinct layers:
 
 | Layer | Name | Description |
 | :--- | :--- | :--- |
 | **L0** | **Kernel** | The immutable "Constitution" of your project (`PROJECT_OS.md`). |
-| **L1** | **Adapters** | Pointer files (`.cursorrules`, `CLAUDE.md`) that bridge the AI to the Kernel. |
-| **L2** | **Skills** | Modular specialized knowledge (e.g., "How we write React code" or "TDD Rules"). |
-| **L3** | **Docs** | Evidence and history (ADRs, Decision logs, and Walkthroughs). |
-
----
-
-## 📂 Architecture
+| **L1** | **Adapters** | Pointer files (`.cursorrules`, `CLAUDE.md`, `GEMINI.md`) that bridge the AI to the Kernel. |
+| **L2** | **Skills** | Modular capabilities (React, Fastify, TDD) automatically generated and vetted. |
+| **L3** | **Memory** | Operational session logs allowing continuity across distinct agent runs. |
 
 ```text
 ├── PROJECT_OS.md       # L0: The Kernel (Single Source of Truth)
 ├── CLAUDE.md           # L1: Adapter for Claude/Antigravity
 ├── .cursorrules        # L1: Adapter for Cursor AI
-├── .agent/             # L1: Adapter for Generic Agents
-├── skills/             # L2: Modular Capabilities (React, Rust, etc.)
-└── docs/               # L3: Human-Readable Context
+├── GEMINI.md           # L1: Adapter for Gemini AI
+├── skills/             # L2: Modular Capabilities (TDD, Frameworks)
+└── memory/             # L3: Dynamic Shared Memory
 ```
+
+---
 
 ## 🚀 Getting Started
 
-Most projects you work on will already exist. Therefore, the best way to leverage `ai-context-os` is to integrate its core files into your existing repository rather than forking.
+The best way to leverage `ai-context-os` is to drop it into your existing projects to instantly structure their AI workflows.
 
-### Option 1: Automated Install (Pointer Pattern - Recommended)
-You can use the provided install script to automatically copy the core files into a hidden `.ai-context-os/` folder in your project and create pointer files in the root:
-
-| Command | Action | Example |
-| :--- | :--- | :--- |
-| `npx ai-context-os .` | Quick Integration (Current Dir) | `npx ai-context-os .` |
-| `npx ai-context-os audit` | Check Architectural Compliance | `npx ai-context-os audit` |
-| `npx ai-context-os -v` | Show Current version | `npx ai-context-os -v` |
-
-*Why this is better:* Keeps your project root clean. You will only see `.cursorrules` and `CLAUDE.md` in your root which act as pointers to the true OS rules inside `.ai-context-os/`.
-
-### Option 2: Manual Install
-1.  **Create OS Folder**: `mkdir .ai-context-os` in your project root.
-2.  **Integrate Core Files**: Copy `PROJECT_OS.md`, `.cursorrules`, `CLAUDE.md`, and the `skills` folder into `.ai-context-os/`.
-3.  **Boot the AI via Pointers**: Create a `.cursorrules` or `CLAUDE.md` file in the root of your existing project mapping to the files in `.ai-context-os/`.
-
-## 📜 Core Protocols
-
-- **Protocol-First**: Rules in `PROJECT_OS.md` override any AI training.
-- **Context Hygiene**: Always scout before implementing.
-- **Modularity**: Files < 200 lines. Docker for execution.
-- **Atomic Documentation**: Every code change MUST include simultaneous documentation updates.
-- **Regression Assurance**: Full test suites must be rerun after every modification.
-
----
-
-## 🔄 Common Workflows
-
-### 1. Fresh Integration
-To add the OS to a new project (Automatic mode):
+### 1. Automated Integration (Recommended)
+Run the following in your project root to provision the hidden `.ai-context-os/` folder and setup the L1 pointers:
 ```bash
 npx ai-context-os .
 ```
-*(Optionally use `npx ai-context-os install .` if you prefer explicit subcommands)*
 
-### 2. Checking Compliance
-To verify if your project still adheres to the rules:
-```bash
-npx ai-context-os audit --diamond
-```
+*This keeps your root clean. Only `.cursorrules`, `CLAUDE.md`, and `GEMINI.md` are visible, acting as silent bootstrappers.*
 
-### 3. Adding a New "Skill"
-If you want to teach the AI a new standard (e.g., "Always use Tailwind"):
-1. Create a new file: `.ai-context-os/skills/my-new-skill.md`.
-2. Mention it in `PROJECT_OS.md`.
-3. The AI will now automatically follow it as a fallback!
+### 2. Manual Integration
+1. `mkdir .ai-context-os` in your project root.
+2. Use this package as a template: Move `PROJECT_OS.md` and the `skills` folder into your `.ai-context-os/` directory.
+3. Copy one of the `adapter-***.md` templates into your root (rename it to `.cursorrules` or `CLAUDE.md`).
 
 ---
+
+## ⚙️ Core Protocols
+
+- **Protocol-First**: Rules in `PROJECT_OS.md` override any pre-trained AI assumptions.
+- **Silent Synchronization**: Agents establish context context entirely O(1) via the `.ultp_state` cache without executing messy CLI commands.
+- **Atomic Documentation**: Every code change MUST include simultaneous documentation updates.
+- **Regression Assurance**: Full test suites must be rerun after every modification.
+
+## 🛠️ CLI Utilities
+
+| Command | Action |
+| :--- | :--- |
+| `npx ai-context-os .` | Quick Integration (Current Dir) |
+| `npx ai-context-os audit --diamond` | Check Architectural Compliance against Purity rules |
+| `npx ai-context-os scout` | Visualize the active Context Architecture and loaded skills |
 
 ## 🤖 AI-Native Integration (ULTP)
-To integrate this OS with other AI Agents (Cursor, Claude, etc.), add this to your project's root `.cursorrules` or `CLAUDE.md`:
 
-```text
-Run `npx ai-context-os scout --ultra` to identify project architecture.
-Parse the [OS:<State>][L0:<Status>;P:<Path>]... tokens to discover laws and skills.
-```
-This **Ultra-Low Token Protocol** reduces context overhead by **65%**, providing high-density signaling for faster, more accurate AI orchestration.
+This OS uses the **Ultra-Low Token Protocol (ULTP)** to serialize the entire system state into a tiny string:
+`[OS:A][L0:V;P:.ai-context-os/PROJECT_OS.md][L1:C,G,K][L2:tdd,fastify][M:V]`
+
+This reduces context overhead by **65%**, providing high-density signaling for faster, cheaper, and more accurate AI orchestration.
 
 ---
 
-## 🤝 Contributing
+## 🤝 Contributing & Legislation
 
-We welcome PRs that improve the OS kernel or add new L1 adapters.
+The OS is designed to be self-writing. However, we welcome human PRs that improve the kernel or add new standardized L1 adapters. To trigger an AI-driven skill discovery in your fork, simply ask the agent to implement a technology it hasn't seen before.
