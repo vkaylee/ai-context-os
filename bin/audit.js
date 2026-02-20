@@ -7,6 +7,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { COLORS, isKebabCase, isEnglishOnly } from './utils.js';
 
 const MAX_LINES = 200;
@@ -16,161 +17,163 @@ const IGNORED_FILES = [
     'adapter-cursor.md', 'adapter-claude.md', 'adapter-gemini.md', 'utils.test.js'
 ];
 
-let errorCount = 0;
-let warningCount = 0;
-let diamondPass = true;
-
-const isDiamondMode = process.argv.includes('--diamond');
-const isVersionMode = process.argv.includes('--version') || process.argv.includes('-v');
-
-if (isVersionMode) {
-    const __filename = path.join(process.cwd(), 'bin', 'audit.js'); // Heuristic if running locally
-    // Better way: use import.meta.url relative to package.json
-    const binDir = path.dirname(new URL(import.meta.url).pathname);
-    const pkg = JSON.parse(fs.readFileSync(path.join(binDir, '..', 'package.json'), 'utf8'));
-    console.log(`v${pkg.version}`);
-    process.exit(0);
-}
-
-function log(type, message) {
-    switch (type) {
-        case 'error':
-            console.error(`${COLORS.red}${COLORS.bold}[ERROR]${COLORS.reset} ${message}`);
-            errorCount++;
-            diamondPass = false;
-            break;
-        case 'warn':
-            console.warn(`${COLORS.yellow}${COLORS.bold}[WARN]${COLORS.reset} ${message}`);
-            warningCount++;
-            break;
-        case 'success':
-            console.log(`${COLORS.green}✔${COLORS.reset} ${message}`);
-            break;
-        case 'info':
-            console.log(`${COLORS.cyan}ℹ${COLORS.reset} ${message}`);
-            break;
-        case 'diamond':
-            console.log(`${COLORS.cyan}${COLORS.bold}[DIAMOND]${COLORS.reset} ${message}`);
-            break;
-    }
-}
-
 /**
- * Audit a single file.
+ * Core validation logic decoupled from I/O and state.
  */
-function auditFile(filePath) {
-    const filename = path.basename(filePath);
-    const content = fs.readFileSync(filePath, 'utf8');
-    const lines = content.split('\n').length;
-
-    // Rule: Naming Convention (kebab-case)
-    if (!isKebabCase(filename) && !IGNORED_FILES.includes(filename)) {
-        log('error', `Naming violation: '${filename}' must be kebab-case.`);
+export class AuditEngine {
+    constructor(options = {}) {
+        this.isDiamondMode = options.isDiamondMode || false;
+        this.results = {
+            errors: [],
+            warnings: [],
+            successes: [],
+            diamonds: []
+        };
+        this.diamondPass = true;
     }
 
-    // Rule: Modularity (< 200 lines)
-    if (lines > MAX_LINES) {
-        log('error', `Modularity violation: '${filename}' has ${lines} lines (Max: ${MAX_LINES}).`);
-    }
+    validateFile(filename, content) {
+        const lines = content.split('\n').length;
+        const fileErrors = [];
 
-    // Diamond Rule: Language (English Only for .md)
-    if (isDiamondMode && filename.endsWith('.md')) {
-        if (!isEnglishOnly(content)) {
-            log('error', `Language violation: '${filename}' contains non-English characters.`);
-            diamondPass = false;
+        // Rule: Naming Convention
+        if (!isKebabCase(filename) && !IGNORED_FILES.includes(filename)) {
+            fileErrors.push(`Naming violation: '${filename}' must be kebab-case.`);
         }
-    }
-}
 
-/**
- * Recursively audit a directory.
- */
-function auditDir(dirPath) {
-    const items = fs.readdirSync(dirPath);
-
-    for (const item of items) {
-        if (IGNORED_DIRS.includes(item)) continue;
-
-        const fullPath = path.join(dirPath, item);
-        const stats = fs.statSync(fullPath);
-
-        if (stats.isDirectory()) {
-            auditDir(fullPath);
-        } else if (stats.isFile()) {
-            auditFile(fullPath);
+        // Rule: Modularity
+        if (lines > MAX_LINES) {
+            fileErrors.push(`Modularity violation: '${filename}' has ${lines} lines (Max: ${MAX_LINES}).`);
         }
-    }
-}
 
-function auditPointerPattern() {
-    const root = process.cwd();
-    const pointers = ['.cursorrules', 'CLAUDE.md', 'GEMINI.md'];
-
-    for (const p of pointers) {
-        const pPath = path.join(root, p);
-        if (fs.existsSync(pPath)) {
-            const content = fs.readFileSync(pPath, 'utf8');
-            if (!content.includes('.ai-context-os')) {
-                log('warn', `${p} exists but does not seem to follow the Pointer Pattern.`);
-            } else {
-                log('success', `${p} pointer is valid.`);
+        // Diamond Rule: Language
+        if (this.isDiamondMode && filename.endsWith('.md')) {
+            if (!isEnglishOnly(content)) {
+                fileErrors.push(`Language violation: '${filename}' contains non-English characters.`);
+                this.diamondPass = false;
             }
-        } else {
-            log('info', `${p} not found in root.`);
+        }
+
+        fileErrors.forEach(err => this.results.errors.push(err));
+        return fileErrors.length === 0;
+    }
+
+    validatePointer(filename, content) {
+        if (!content.includes('.ai-context-os')) {
+            this.results.warnings.push(`${filename} exists but does not seem to follow the Pointer Pattern.`);
+            return false;
+        }
+        this.results.successes.push(`${filename} pointer is valid.`);
+        return true;
+    }
+}
+
+// --- CLI Runner ---
+const isMain = process.argv[1] && fileURLToPath(import.meta.url) === fs.realpathSync(process.argv[1]);
+
+if (isMain) {
+    const isDiamondMode = process.argv.includes('--diamond');
+    const isVersionMode = process.argv.includes('--version') || process.argv.includes('-v');
+
+    if (isVersionMode) {
+        const binDir = path.dirname(fileURLToPath(import.meta.url));
+        const pkg = JSON.parse(fs.readFileSync(path.join(binDir, '..', 'package.json'), 'utf8'));
+        console.log(`v${pkg.version}`);
+        process.exit(0);
+    }
+
+    const engine = new AuditEngine({ isDiamondMode });
+
+    function log(type, msg) {
+        switch (type) {
+            case 'error': console.error(`${COLORS.red}${COLORS.bold}[ERROR]${COLORS.reset} ${msg}`); break;
+            case 'warn': console.warn(`${COLORS.yellow}${COLORS.bold}[WARN]${COLORS.reset} ${msg}`); break;
+            case 'success': console.log(`${COLORS.green}✔${COLORS.reset} ${msg}`); break;
+            case 'info': console.log(`${COLORS.cyan}ℹ${COLORS.reset} ${msg}`); break;
+            case 'diamond': console.log(`${COLORS.cyan}${COLORS.bold}[DIAMOND]${COLORS.reset} ${msg}`); break;
         }
     }
-}
 
-function auditDiamondStandards() {
-    const root = process.cwd();
-    const goldPath = path.join(root, 'skills', 'gold-standards.md');
-    const diamondPath = path.join(root, 'skills', 'diamond-standards.md');
+    const auditDir = (dirPath) => {
+        const items = fs.readdirSync(dirPath);
+        for (const item of items) {
+            if (IGNORED_DIRS.includes(item)) continue;
+            const fullPath = path.join(dirPath, item);
+            const stats = fs.statSync(fullPath);
+            if (stats.isDirectory()) {
+                auditDir(fullPath);
+            } else if (stats.isFile()) {
+                const content = fs.readFileSync(fullPath, 'utf8');
+                const prevErrorCount = engine.results.errors.length;
+                engine.validateFile(item, content);
+                if (engine.results.errors.length > prevErrorCount) {
+                    const newErrors = engine.results.errors.slice(prevErrorCount);
+                    newErrors.forEach(err => log('error', err));
+                }
+            }
+        }
+    };
 
-    if (fs.existsSync(goldPath)) {
-        log('diamond', 'Gold Engineering Standard detected.');
+    const auditPointers = () => {
+        ['.cursorrules', 'CLAUDE.md', 'GEMINI.md'].forEach(p => {
+            const pPath = path.join(process.cwd(), p);
+            if (fs.existsSync(pPath)) {
+                const content = fs.readFileSync(pPath, 'utf8');
+                const prevWarnCount = engine.results.warnings.length;
+                engine.validatePointer(p, content);
+                if (engine.results.warnings.length > prevWarnCount) {
+                    log('warn', engine.results.warnings[engine.results.warnings.length - 1]);
+                } else {
+                    log('success', `${p} pointer is valid.`);
+                }
+            } else {
+                log('info', `${p} not found in root.`);
+            }
+        });
+    };
+
+    const auditGitignore = () => {
+        const p = path.join(process.cwd(), '.gitignore');
+        if (!fs.existsSync(p)) return;
+        const lines = fs.readFileSync(p, 'utf8').split('\n').map(l => l.trim());
+        if (lines.some(l => l === '.local-os' || l === '.local-os/')) {
+            log('warn', "'.local-os' is in .gitignore. Team overrides won't sync.");
+        }
+        ['.cursorrules', 'CLAUDE.md', 'GEMINI.md'].forEach(f => {
+            if (lines.some(l => l === f)) log('error', `Pointer '${f}' is in .gitignore. Breaks Context Engine.`);
+        });
+    };
+
+    const auditDiamondResources = () => {
+        const root = process.cwd();
+        const goldPath = path.join(root, 'skills', 'gold-standards.md');
+        const diamondPath = path.join(root, 'skills', 'diamond-standards.md');
+
+        if (fs.existsSync(goldPath)) log('diamond', 'Gold Engineering Standard detected.');
+        else { log('warn', 'Gold Standard skill missing.'); engine.diamondPass = false; }
+
+        if (fs.existsSync(diamondPath)) log('diamond', 'Diamond Engineering Standard detected.');
+        else { log('warn', 'Diamond Standard skill missing.'); engine.diamondPass = false; }
+    };
+
+    console.log(`${COLORS.bold}\n====================================`);
+    console.log(`  AI Context OS Audit v1.2.0 ${isDiamondMode ? '[DIAMOND MODE]' : ''} `);
+    console.log(`====================================${COLORS.reset}\n`);
+
+    auditDir(process.cwd());
+    auditPointers();
+    auditGitignore();
+    if (isDiamondMode) auditDiamondResources();
+
+    console.log(`\n------------------------------------`);
+    if (engine.results.errors.length > 0) {
+        console.log(`${COLORS.red}${COLORS.bold}Audit Failed: ${engine.results.errors.length} error(s).${COLORS.reset}`);
+        process.exit(1);
+    } else if (isDiamondMode && !engine.diamondPass) {
+        console.log(`${COLORS.yellow}${COLORS.bold}Audit Passed with Warnings: Diamond Standard not fully met.${COLORS.reset}`);
+        process.exit(0);
     } else {
-        log('warn', 'Gold Standard skill missing.');
-        diamondPass = false;
+        console.log(`${COLORS.green}${COLORS.bold}Audit Passed: All protocols followed!${COLORS.reset}`);
+        process.exit(0);
     }
-
-    if (fs.existsSync(diamondPath)) {
-        log('diamond', 'Diamond Engineering Standard detected.');
-    } else {
-        log('warn', 'Diamond Standard skill missing.');
-        diamondPass = false;
-    }
-}
-
-function auditGitignore() {
-    const p = path.join(process.cwd(), '.gitignore');
-    if (!fs.existsSync(p)) return;
-    const lines = fs.readFileSync(p, 'utf8').split('\n').map(l => l.trim());
-    if (lines.some(l => l === '.local-os' || l === '.local-os/')) {
-        log('warn', "'.local-os' is in .gitignore. Team overrides won't sync.");
-    }
-    for (const f of ['.cursorrules', 'CLAUDE.md', 'GEMINI.md']) {
-        if (lines.some(l => l === f)) log('error', `Pointer '${f}' is in .gitignore. Breaks Context Engine.`);
-    }
-}
-
-// Start Audit
-console.log(`${COLORS.bold}\n====================================`);
-console.log(`  AI Context OS Audit v1.1.0 ${isDiamondMode ? '[DIAMOND MODE]' : ''} `);
-console.log(`====================================${COLORS.reset}\n`);
-
-auditDir(process.cwd());
-auditPointerPattern();
-auditGitignore();
-if (isDiamondMode) auditDiamondStandards();
-
-console.log(`\n------------------------------------`);
-if (errorCount > 0) {
-    console.log(`${COLORS.red}${COLORS.bold}Audit Failed: ${errorCount} error(s), ${warningCount} warning(s).${COLORS.reset}`);
-    process.exit(1);
-} else if (isDiamondMode && !diamondPass) {
-    console.log(`${COLORS.yellow}${COLORS.bold}Audit Passed with Warnings: Diamond Standard not fully met.${COLORS.reset}`);
-    process.exit(0);
-} else {
-    console.log(`${COLORS.green}${COLORS.bold}Audit Passed: All protocols followed!${COLORS.reset}`);
-    process.exit(0);
 }
