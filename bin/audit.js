@@ -89,8 +89,17 @@ if (isMain) {
 
     const isDiamondMode = args.includes('--diamond');
     const isJsonMode = args.includes('--json');
+    const isUltraMode = args.includes('--ultra');
     const engine = new AuditEngine({ isDiamondMode });
     const root = process.cwd();
+
+    if (isUltraMode) {
+        engine.auditDir(root);
+        engine.auditPointers(root);
+        engine.auditGitignore(root);
+        console.log(`[AUDIT:${engine.results.errors.length > 0 ? 'FAIL' : 'PASS'};E:${engine.results.errors.length};W:${engine.results.warnings.length}]`);
+        process.exit(engine.results.errors.length > 0 ? 1 : 0);
+    }
 
     /** @param {'error'|'warn'|'success'|'info'|'diamond'} type @param {string} msg */
     function log(type, msg) {

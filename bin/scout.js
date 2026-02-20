@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import { COLORS } from './utils.js';
 import { CompressorEngine } from './compressor.js';
 import { ScoutEngine } from './scout-engine.js';
+import { ULTP } from './ultp.js';
 
 const isMain = process.argv[1] && fileURLToPath(import.meta.url) === fs.realpathSync(process.argv[1]);
 if (isMain) {
@@ -18,12 +19,22 @@ if (isMain) {
         process.exit(0);
     }
     if (args.includes('--help') || args.includes('-h')) {
-        console.log(`Usage: npx ai-context-os scout [--json] [--compress]\nVisualizes the active AI Context OS environment.`);
+        console.log(`Usage: npx ai-context-os scout [--json] [--compress] [--ultra]\nVisualizes the active AI Context OS environment.`);
         process.exit(0);
     }
 
-    const isJsonMode = args.includes('--json'), isCompressMode = args.includes('--compress');
+    const isJsonMode = args.includes('--json'), isCompressMode = args.includes('--compress'), isUltraMode = args.includes('--ultra');
     const engine = new ScoutEngine(process.cwd()), osDir = engine.detectActiveOsDir();
+
+    if (isUltraMode) {
+        /** @type {import('./ultp.js').ULTPState} */
+        const results = {
+            environment: { osRoot: osDir ? `./${osDir}/` : null, status: osDir || engine.isSourceRepo() ? 'ACTIVE' : 'NOT INSTALLED', isDogfooding: engine.isSourceRepo() },
+            kernel: engine.getKernelStatus(osDir), adapters: engine.getAdapterStatus(), skills: engine.getSkills(osDir)
+        };
+        console.log(ULTP.encode(results));
+        process.exit(0);
+    }
 
     if (isCompressMode) {
         const { path: kPath, found } = engine.getKernelStatus(osDir);

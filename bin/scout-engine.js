@@ -6,6 +6,7 @@ import path from 'path';
  * Encapsulates contextual visualization and detection logic.
  */
 export class ScoutEngine {
+    /** @typedef {import('./ultp.js').ULTPState} ULTPState */
     /** @param {string} cwd */
     constructor(cwd) { this.cwd = cwd; }
 
