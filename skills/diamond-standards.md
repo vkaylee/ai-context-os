@@ -13,3 +13,8 @@
 ## 3. Diamond Validation
 - **Deep Verification**: Validation is not just "it works". It is "it works, it's modular, it's audited, it's documented, and it's optimized for token efficiency."
 - **Immutable Kernel**: Never modify the L0 Kernel (`PROJECT_OS.md`) without a specific "Architecture Change Request" task.
+
+## 4. Proactive Autonomy
+- **No-Prompt Protocol**: AI agents MUST NOT ask the user for permission to perform mandatory protocol steps (Auditing, Testing, Documentation Sync). These are integral parts of any task and must be executed autonomously.
+- **Pre-emptive Verification**: If an agent identifies a potential regression or a documentation gap *unrelated* to the current task, it should proactively propose or perform a fix as part of its 'Context Stewardship' responsibility.
+- **Autonomous Release**: Following a successful task, the agent should automatically prepare the next version (v-bump) and push changes if the environment allows.

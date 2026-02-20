@@ -48,6 +48,7 @@ Before writing any code, every AI agent must:
 2.  **Check L1**: Verify tool-specific rules (e.g., `docker-helper.sh` usage).
 3.  **Audit**: Run `npx ai-context-os audit` (or local `bin/audit.js`) to ensure the current state is compliant before and after execution.
 4.  **Execute**: Perform the task strictly within the defined boundaries.
+5.  **Autonomous Enforcement**: AI agents are mandated to be proactive. Verification, auditing, and documentation sync must be performed autonomously without waiting for user prompts.
 
 ### 3.2 File & Code Standards
 - **Modularity**: Files must not exceed **200 lines**. Refactor immediately if they do.
