@@ -46,7 +46,8 @@ To maintain project integrity and recursive efficiency, we distinguish between:
 Before writing any code, every AI agent must:
 1.  **Read L0**: Check `PROJECT_OS.md` for current constraints.
 2.  **Check L1**: Verify tool-specific rules (e.g., `docker-helper.sh` usage).
-3.  **Execute**: Perform the task strictly within the defined boundaries.
+3.  **Audit**: Run `npx ai-context-os-audit` (or local `bin/audit.js`) to ensure the current state is compliant before and after execution.
+4.  **Execute**: Perform the task strictly within the defined boundaries.
 
 ### 3.2 File & Code Standards
 - **Modularity**: Files must not exceed **200 lines**. Refactor immediately if they do.

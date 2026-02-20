@@ -1,9 +1,10 @@
 {
   "name": "ai-context-os",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "An installable LLM Orchestrator Framework for AI Agents (Cursor, Claude, etc.)",
   "bin": {
-    "ai-context-os": "bin/install.js"
+    "ai-context-os": "bin/install.js",
+    "ai-context-os-audit": "bin/audit.js"
   },
   "type": "module",
   "files": [
