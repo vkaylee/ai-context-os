@@ -35,10 +35,11 @@ Most projects you work on will already exist. Therefore, the best way to leverag
 You can use the provided install script to automatically copy the core files into a hidden `.ai-context-os/` folder in your project and create pointer files in the root:
 
 ```bash
-# From the project where you want to install
-npx ai-context-os .
-# Or to point to a specific directory
-npx ai-context-os /path/to/your/existing/project
+# To integrate into your current project
+npx ai-context-os install .
+
+# Or check if a project is compliant
+npx ai-context-os audit --diamond
 ```
 *Why this is better:* Keeps your project root clean. You will only see `.cursorrules` and `CLAUDE.md` in your root which act as pointers to the true OS rules inside `.ai-context-os/`.
 
@@ -52,6 +53,8 @@ npx ai-context-os /path/to/your/existing/project
 - **Protocol-First**: Rules in `PROJECT_OS.md` override any AI training.
 - **Context Hygiene**: Always scout before implementing.
 - **Modularity**: Files < 200 lines. Docker for execution.
+- **Atomic Documentation**: Every code change MUST include simultaneous documentation updates.
+- **Regression Assurance**: Full test suites must be rerun after every modification.
 
 ---
 
