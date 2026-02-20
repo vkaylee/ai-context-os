@@ -1,6 +1,6 @@
 {
   "name": "ai-context-os",
-  "version": "2.8.0",
+  "version": "2.8.1",
   "description": "An installable LLM Orchestrator Framework for AI Agents (Cursor, Claude, etc.)",
   "bin": {
     "ai-context-os": "bin/cli.js",
@@ -11,6 +11,7 @@
     "bin",
     "skills",
     "PROJECT_OS.md",
+    "README.md",
     "adapter-cursor.md",
     "adapter-claude.md",
     "adapter-gemini.md"
@@ -35,6 +36,6 @@
     "access": "public"
   },
   "dependencies": {
-    "ai-context-os": "^2.8.0"
+    "ai-context-os": "^2.8.1"
   }
 }
