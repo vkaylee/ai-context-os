@@ -16,6 +16,29 @@ This OS uses a **Fallback Architecture (Inheritance)**. Users can define their o
 
 ---
 
+## 🧩 How it Works: The "Pointer Architecture"
+
+The biggest challenge in AI projects is **Context Pollution** (when the AI reads too many conflicting rule files). `ai-context-os` solves this by hiding the heavy logic inside a `.ai-context-os/` directory and placing small "Pointer" files in your project root.
+
+1. **The Kernel**: All your project's rules live in `.ai-context-os/PROJECT_OS.md`.
+2. **The Pointers**: Files like `.cursorrules` or `CLAUDE.md` in your root don't contain rules themselves; they tell the AI: *"Stop! Don't look here. Go read `.ai-context-os/PROJECT_OS.md` instead."*
+3. **The Result**: Your project root stays clean, and the AI only ever has **one source of truth**.
+
+---
+
+## 🏛️ Core Concepts (The Layers)
+
+We organize intelligence into four distinct layers:
+
+| Layer | Name | Description |
+| :--- | :--- | :--- |
+| **L0** | **Kernel** | The immutable "Constitution" of your project (`PROJECT_OS.md`). |
+| **L1** | **Adapters** | Pointer files (`.cursorrules`, `CLAUDE.md`) that bridge the AI to the Kernel. |
+| **L2** | **Skills** | Modular specialized knowledge (e.g., "How we write React code" or "TDD Rules"). |
+| **L3** | **Docs** | Evidence and history (ADRs, Decision logs, and Walkthroughs). |
+
+---
+
 ## 📂 Architecture
 
 ```text
@@ -54,6 +77,28 @@ You can use the provided install script to automatically copy the core files int
 - **Modularity**: Files < 200 lines. Docker for execution.
 - **Atomic Documentation**: Every code change MUST include simultaneous documentation updates.
 - **Regression Assurance**: Full test suites must be rerun after every modification.
+
+---
+
+## 🔄 Common Workflows
+
+### 1. Fresh Integration
+To add the OS to a new project:
+```bash
+npx ai-context-os install .
+```
+
+### 2. Checking Compliance
+To verify if your project still adheres to the rules:
+```bash
+npx ai-context-os audit --diamond
+```
+
+### 3. Adding a New "Skill"
+If you want to teach the AI a new standard (e.g., "Always use Tailwind"):
+1. Create a new file: `.ai-context-os/skills/my-new-skill.md`.
+2. Mention it in `PROJECT_OS.md`.
+3. The AI will now automatically follow it as a fallback!
 
 ---
 
