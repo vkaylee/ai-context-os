@@ -7,15 +7,7 @@
 
 import fs from 'fs';
 import path from 'path';
-
-const COLORS = {
-    reset: '\x1b[0m',
-    red: '\x1b[31m',
-    green: '\x1b[32m',
-    yellow: '\x1b[33m',
-    cyan: '\x1b[36m',
-    bold: '\x1b[1m'
-};
+import { COLORS, isKebabCase, isEnglishOnly } from './utils.js';
 
 const MAX_LINES = 200;
 const IGNORED_DIRS = ['node_modules', '.git', '.ai-context-os'];
@@ -48,29 +40,6 @@ function log(type, message) {
             console.log(`${COLORS.cyan}${COLORS.bold}[DIAMOND]${COLORS.reset} ${message}`);
             break;
     }
-}
-
-/**
- * Check if a filename follows kebab-case.
- */
-function isKebabCase(filename) {
-    if (filename.startsWith('.') || filename.startsWith('_')) return true; // Ignore hidden files
-    const nameWithoutExt = path.parse(filename).name;
-    return /^[a-z0-9]+(-[a-z0-9]+)*$/.test(nameWithoutExt);
-}
-
-/**
- * Basic check for non-English characters in text.
- */
-function isEnglishOnly(text) {
-    // This is a simple heuristic: check for Vietnamese diacritics or other non-ASCII chars
-    // that are common in documentation but not in standard English.
-    // We allow emojis and common symbols.
-    const nonEnglishRegex = /[^\x00-\x7Fàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/gi;
-    // Actually, let's just check for the presence of common Vietnamese characters specifically
-    // to avoid false positives with emojis.
-    const vietnameseRegex = /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/gi;
-    return !vietnameseRegex.test(text);
 }
 
 /**
