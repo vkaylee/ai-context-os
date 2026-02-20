@@ -3,6 +3,7 @@
 > [!IMPORTANT]
 > You are operating under the AI Context OS.
 > **Law:** Read and adhere to the entire AI Operating System at: `.ai-context-os/PROJECT_OS.md` and skills at `.ai-context-os/skills/`.
+> **Fast-Track:** Run `npx ai-context-os scout --ultra` to instantly sync with the project's active state.
 > **Fallback:** If the project has `.local-os/`, prioritize `.local-os/` first.
 
 ## Cursor-Specific Capabilities
