@@ -21,145 +21,117 @@ const colors = {
     cyan: '\x1b[36m'
 };
 
-const __filename = fileURLToPath(import.meta.url);
-const SOURCE_DIR = path.resolve(path.dirname(__filename), '..');
-
-console.log(`${colors.blue}==============================${colors.reset}`);
-console.log(`${colors.blue}  ai-context-os Installer   ${colors.reset}`);
-console.log(`${colors.blue}==============================${colors.reset}`);
-
-// Parse arguments
-const args = process.argv.slice(2);
-const helpParam = args.find(arg => arg === '--help' || arg === '-h');
-const versionParam = args.find(arg => arg === '--version' || arg === '-v');
-
-if (versionParam) {
-    const pkg = JSON.parse(fs.readFileSync(path.join(SOURCE_DIR, 'package.json'), 'utf8'));
-    console.log(`v${pkg.version}`);
-    process.exit(0);
-}
-
-if (helpParam || args.length === 0) {
-    console.log(`${colors.yellow}Usage: npx ai-context-os <target_project_directory>${colors.reset}`);
-    console.log('Example: npx ai-context-os ../my-existing-app');
-    console.log('Or use "." for the current directory: npx ai-context-os .\n');
-    process.exit(args.length === 0 ? 1 : 0);
-}
-
-const targetInput = args[0];
-const TARGET_DIR = path.resolve(process.cwd(), targetInput);
-
-if (!fs.existsSync(TARGET_DIR)) {
-    console.error(`${colors.red}Error: Target directory '${TARGET_DIR}' does not exist.${colors.reset}`);
-    console.error('Please provide a valid path to an existing project.');
-    process.exit(1);
-}
-
-const OS_DIR = path.join(TARGET_DIR, '.ai-context-os');
-
-console.log(`\n${colors.cyan}Target Project:${colors.reset} ${TARGET_DIR}`);
-console.log(`${colors.cyan}Creating OS Directory:${colors.reset} ${OS_DIR}`);
-
-// Create `.ai-context-os/` in target
-fs.mkdirSync(OS_DIR, { recursive: true });
-
-console.log(`\n${colors.yellow}Copying core OS files...${colors.reset}`);
-
-const FILES_TO_COPY = [
-    'PROJECT_OS.md'
-];
-
-const DIRS_TO_COPY = [
-    'skills'
-];
-
-// Copy files
-for (const file of FILES_TO_COPY) {
-    const srcPath = path.join(SOURCE_DIR, file);
-    const destPath = path.join(OS_DIR, file);
-
-    if (fs.existsSync(srcPath)) {
-        console.log(`  Copying ${file}...`);
-        fs.copyFileSync(srcPath, destPath);
-    } else {
-        console.warn(`${colors.yellow}Warning: Source file '${file}' not found.${colors.reset}`);
+export class InstallerEngine {
+    constructor(sourceDir) {
+        this.sourceDir = sourceDir;
     }
-}
 
-// Helper to copy directory recursively
-function copyDirSync(src, dest) {
-    fs.mkdirSync(dest, { recursive: true });
-    let entries = fs.readdirSync(src, { withFileTypes: true });
+    copyDirSync(src, dest) {
+        fs.mkdirSync(dest, { recursive: true });
+        let entries = fs.readdirSync(src, { withFileTypes: true });
 
-    for (let entry of entries) {
-        let srcPath = path.join(src, entry.name);
-        let destPath = path.join(dest, entry.name);
+        for (let entry of entries) {
+            let srcPath = path.join(src, entry.name);
+            let destPath = path.join(dest, entry.name);
 
-        entry.isDirectory() ? copyDirSync(srcPath, destPath) : fs.copyFileSync(srcPath, destPath);
-    }
-}
-
-// Copy directories
-for (const dir of DIRS_TO_COPY) {
-    const srcPath = path.join(SOURCE_DIR, dir);
-    const destPath = path.join(OS_DIR, dir);
-
-    if (fs.existsSync(srcPath)) {
-        console.log(`  Copying directory ${dir}/...`);
-        copyDirSync(srcPath, destPath);
-    } else {
-        console.warn(`${colors.yellow}Warning: Source directory '${dir}' not found.${colors.reset}`);
-    }
-}
-
-console.log(`\n${colors.yellow}Generating Root Adapters...${colors.reset}`);
-
-const cursorrulesContent = fs.readFileSync(path.join(SOURCE_DIR, 'adapter-cursor.md'), 'utf8');
-const claudeContent = fs.readFileSync(path.join(SOURCE_DIR, 'adapter-claude.md'), 'utf8');
-const geminiContent = fs.readFileSync(path.join(SOURCE_DIR, 'adapter-gemini.md'), 'utf8');
-
-let isSelfInstall = false;
-try {
-    const targetPkgPath = path.join(TARGET_DIR, 'package.json');
-    if (fs.existsSync(targetPkgPath)) {
-        const targetPkg = JSON.parse(fs.readFileSync(targetPkgPath, 'utf8'));
-        if (targetPkg.name === 'ai-context-os') {
-            isSelfInstall = true;
+            entry.isDirectory() ? this.copyDirSync(srcPath, destPath) : fs.copyFileSync(srcPath, destPath);
         }
     }
-} catch (e) {
-    // Ignore errors
-}
 
-if (isSelfInstall) {
-    console.log(`  ${colors.cyan}[Dogfooding Mode] Target is 'ai-context-os' source repo.${colors.reset}`);
-    console.log(`  Skipping adapter file generation to protect source repo.`);
-} else {
-    fs.writeFileSync(path.join(TARGET_DIR, '.cursorrules'), cursorrulesContent, 'utf8');
-    console.log('  Generated .cursorrules adapter.');
+    isSelfInstall(targetDir) {
+        try {
+            const targetPkgPath = path.join(targetDir, 'package.json');
+            if (fs.existsSync(targetPkgPath)) {
+                const targetPkg = JSON.parse(fs.readFileSync(targetPkgPath, 'utf8'));
+                return targetPkg.name === 'ai-context-os';
+            }
+        } catch (e) {
+            return false;
+        }
+        return false;
+    }
 
-    fs.writeFileSync(path.join(TARGET_DIR, 'CLAUDE.md'), claudeContent, 'utf8');
-    console.log('  Generated CLAUDE.md adapter.');
+    install(targetDir, logCallback = () => { }) {
+        const osDir = path.join(targetDir, '.ai-context-os');
+        fs.mkdirSync(osDir, { recursive: true });
 
-    fs.writeFileSync(path.join(TARGET_DIR, 'GEMINI.md'), geminiContent, 'utf8');
-    console.log('  Generated GEMINI.md adapter.');
-}
+        const filesToCopy = ['PROJECT_OS.md'];
+        const dirsToCopy = ['skills'];
 
-const gitignorePath = path.join(TARGET_DIR, '.gitignore');
-if (fs.existsSync(gitignorePath)) {
-    const content = fs.readFileSync(gitignorePath, 'utf8');
-    const lines = content.split('\n').map(l => l.trim());
-    if (lines.some(l => l === '.local-os' || l === '.local-os/')) {
-        console.warn(`\n${colors.yellow}⚠️  [WARNING] '.local-os' is currently in your .gitignore!${colors.reset}`);
-        console.warn(`${colors.yellow}If you intend to share custom AI rules with your team, you MUST remove it from .gitignore.${colors.reset}`);
-        console.warn(`${colors.yellow}If this is for pure personal machine overrides, you may ignore this warning.${colors.reset}`);
+        for (const file of filesToCopy) {
+            const srcPath = path.join(this.sourceDir, file);
+            const destPath = path.join(osDir, file);
+            if (fs.existsSync(srcPath)) {
+                logCallback(`  Copying ${file}...`);
+                fs.copyFileSync(srcPath, destPath);
+            }
+        }
+
+        for (const dir of dirsToCopy) {
+            const srcPath = path.join(this.sourceDir, dir);
+            const destPath = path.join(osDir, dir);
+            if (fs.existsSync(srcPath)) {
+                logCallback(`  Copying directory ${dir}/...`);
+                this.copyDirSync(srcPath, destPath);
+            }
+        }
+
+        if (this.isSelfInstall(targetDir)) {
+            logCallback(`  [Dogfooding Mode] Skipping adapter file generation.`);
+        } else {
+            const adapters = {
+                '.cursorrules': 'adapter-cursor.md',
+                'CLAUDE.md': 'adapter-claude.md',
+                'GEMINI.md': 'adapter-gemini.md'
+            };
+
+            for (const [dest, src] of Object.entries(adapters)) {
+                const content = fs.readFileSync(path.join(this.sourceDir, src), 'utf8');
+                fs.writeFileSync(path.join(targetDir, dest), content, 'utf8');
+                logCallback(`  Generated ${dest} adapter.`);
+            }
+        }
+        return osDir;
     }
 }
 
-console.log(`\n${colors.green}✅ Integration Complete!${colors.reset}`);
-console.log(`The AI Context OS has been installed in: ${OS_DIR}`);
-console.log(`\n${colors.yellow}Next Steps:${colors.reset}`);
-console.log(`1. Navigate to your project: cd ${TARGET_DIR}`);
-console.log(`2. The AI will now automatically read from .ai-context-os/ via the pointer files.`);
-console.log(`3. To override rules, create your own local skills (e.g., in .local-os/skills/) rather than modifying the core OS files.`);
-console.log(`4. Reload your AI assistant (Cursor/Claude/Gemini) window.\n`);
+// --- CLI Runner ---
+const isMain = process.argv[1] && fileURLToPath(import.meta.url) === fs.realpathSync(process.argv[1]);
+
+if (isMain) {
+    const __filename = fileURLToPath(import.meta.url);
+    const SOURCE_DIR = path.resolve(path.dirname(__filename), '..');
+
+    const args = process.argv.slice(2);
+    const helpParam = args.find(arg => arg === '--help' || arg === '-h');
+    const versionParam = args.find(arg => arg === '--version' || arg === '-v');
+
+    if (versionParam) {
+        const pkg = JSON.parse(fs.readFileSync(path.join(SOURCE_DIR, 'package.json'), 'utf8'));
+        console.log(`v${pkg.version}`);
+        process.exit(0);
+    }
+
+    if (helpParam || args.length === 0) {
+        console.log(`${colors.yellow}Usage: npx ai-context-os <target_path>${colors.reset}`);
+        process.exit(args.length === 0 ? 1 : 0);
+    }
+
+    console.log(`${colors.blue}==============================${colors.reset}`);
+    console.log(`${colors.blue}  ai-context-os Installer   ${colors.reset}`);
+    console.log(`${colors.blue}==============================${colors.reset}`);
+
+    const targetInput = args[0];
+    const TARGET_DIR = path.resolve(process.cwd(), targetInput);
+
+    if (!fs.existsSync(TARGET_DIR)) {
+        console.error(`${colors.red}Error: Target directory '${TARGET_DIR}' does not exist.${colors.reset}`);
+        process.exit(1);
+    }
+
+    const installer = new InstallerEngine(SOURCE_DIR);
+    const osDir = installer.install(TARGET_DIR, msg => console.log(msg));
+
+    console.log(`\n${colors.green}✅ Integration Complete!${colors.reset}`);
+    console.log(`The AI Context OS has been installed in: ${osDir}`);
+}

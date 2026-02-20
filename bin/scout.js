@@ -10,93 +10,132 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { COLORS } from './utils.js';
 
-const cwd = process.cwd();
+export class ScoutEngine {
+    constructor(cwd) {
+        this.cwd = cwd;
+    }
 
-// --- Detect OS Root ---
-const osDirs = ['.ai-context-os', '.local-os'];
-let activeOsDir = osDirs.find(dir => fs.existsSync(path.join(cwd, dir)));
+    detectActiveOsDir() {
+        const osDirs = ['.ai-context-os', '.local-os'];
+        return osDirs.find(dir => fs.existsSync(path.join(this.cwd, dir)));
+    }
 
-console.log(`${COLORS.bold}\n====================================`);
-console.log(`  AI Context OS Scout 🔍            `);
-console.log(`====================================${COLORS.reset}\n`);
+    isSourceRepo() {
+        const pkgPath = path.join(this.cwd, 'package.json');
+        if (!fs.existsSync(pkgPath)) return false;
+        try {
+            return JSON.parse(fs.readFileSync(pkgPath, 'utf8')).name === 'ai-context-os';
+        } catch (e) {
+            return false;
+        }
+    }
 
-// 1. Environment Status
-if (activeOsDir) {
-    console.log(`${COLORS.cyan}${COLORS.bold}[ENVIRONMENT]${COLORS.reset}`);
-    console.log(`  OS Root  : ./${activeOsDir}/`);
-    console.log(`  Status   : ACTIVE\n`);
-} else {
-    // If not found in CWD, check if we are in the source repo itself
-    const pkgPath = path.join(cwd, 'package.json');
-    const isSource = fs.existsSync(pkgPath) && JSON.parse(fs.readFileSync(pkgPath, 'utf8')).name === 'ai-context-os';
+    getKernelStatus(activeOsDir) {
+        let kernelPath = null;
+        if (activeOsDir) {
+            kernelPath = path.join(this.cwd, activeOsDir, 'PROJECT_OS.md');
+        } else if (fs.existsSync(path.join(this.cwd, 'PROJECT_OS.md'))) {
+            kernelPath = path.join(this.cwd, 'PROJECT_OS.md');
+        }
+        return {
+            path: (kernelPath && fs.existsSync(kernelPath)) ? path.relative(this.cwd, kernelPath) : null,
+            found: !!(kernelPath && fs.existsSync(kernelPath))
+        };
+    }
 
-    if (isSource) {
+    getAdapterStatus() {
+        const adapters = ['.cursorrules', 'CLAUDE.md', 'GEMINI.md'];
+        return adapters.map(a => {
+            const p = path.join(this.cwd, a);
+            const found = fs.existsSync(p);
+            let pointsTo = null;
+            if (found) {
+                const content = fs.readFileSync(p, 'utf8');
+                pointsTo = content.includes('.ai-context-os') ? '.ai-context-os' : (content.includes('.local-os') ? '.local-os' : 'CORE/DIRECT');
+            }
+            return { name: a, found, pointsTo };
+        });
+    }
+
+    getSkills(activeOsDir) {
+        let skillsDir = null;
+        if (activeOsDir) {
+            skillsDir = path.join(this.cwd, activeOsDir, 'skills');
+        } else if (fs.existsSync(path.join(this.cwd, 'skills'))) {
+            skillsDir = path.join(this.cwd, 'skills');
+        }
+        if (skillsDir && fs.existsSync(skillsDir)) {
+            return fs.readdirSync(skillsDir).filter(f => f.endsWith('.md') && f !== 'README.md').map(f => f.replace('.md', ''));
+        }
+        return [];
+    }
+}
+
+// --- CLI Runner ---
+const isMain = process.argv[1] && fileURLToPath(import.meta.url) === fs.realpathSync(process.argv[1]);
+
+if (isMain) {
+    const SOURCE_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+    const args = process.argv.slice(2);
+
+    if (args.includes('--version') || args.includes('-v')) {
+        const pkg = JSON.parse(fs.readFileSync(path.join(SOURCE_DIR, 'package.json'), 'utf8'));
+        console.log(`v${pkg.version}`);
+        process.exit(0);
+    }
+
+    if (args.includes('--help') || args.includes('-h')) {
+        console.log(`Usage: npx ai-context-os scout`);
+        console.log(`Visualizes the active AI Context OS environment.`);
+        process.exit(0);
+    }
+
+    const engine = new ScoutEngine(process.cwd());
+    const activeOsDir = engine.detectActiveOsDir();
+
+    console.log(`${COLORS.bold}\n====================================`);
+    console.log(`  AI Context OS Scout 🔍            `);
+    console.log(`====================================${COLORS.reset}\n`);
+
+    if (activeOsDir) {
+        console.log(`${COLORS.cyan}${COLORS.bold}[ENVIRONMENT]${COLORS.reset}`);
+        console.log(`  OS Root  : ./${activeOsDir}/`);
+        console.log(`  Status   : ACTIVE\n`);
+    } else if (engine.isSourceRepo()) {
         console.log(`${COLORS.green}${COLORS.bold}[ENVIRONMENT]${COLORS.reset}`);
         console.log(`  Mode     : SOURCE REPO (Dogfooding)`);
         console.log(`  Status   : ACTIVE\n`);
     } else {
         console.log(`${COLORS.yellow}${COLORS.bold}[ENVIRONMENT]${COLORS.reset}`);
-        console.log(`  Status   : NOT INSTALLED (Root context missing)\n`);
+        console.log(`  Status   : NOT INSTALLED\n`);
     }
-}
 
-// 2. L0 Kernel
-// Try to find Kernel in OS Dir or root
-let kernelPath = null;
-if (activeOsDir) {
-    kernelPath = path.join(cwd, activeOsDir, 'PROJECT_OS.md');
-} else if (fs.existsSync(path.join(cwd, 'PROJECT_OS.md'))) {
-    kernelPath = path.join(cwd, 'PROJECT_OS.md');
-}
-
-if (kernelPath && fs.existsSync(kernelPath)) {
+    const { path: kPath, found } = engine.getKernelStatus(activeOsDir);
     console.log(`${COLORS.cyan}${COLORS.bold}[L0: KERNEL]${COLORS.reset}`);
-    console.log(`  Path     : ${path.relative(cwd, kernelPath)}`);
-    console.log(`  Status   : FOUND (Single Source of Truth)\n`);
-} else {
-    console.log(`${COLORS.red}${COLORS.bold}[L0: KERNEL]${COLORS.reset}`);
-    console.log(`  Status   : MISSING!\n`);
-}
-
-// 3. L1 Adapters
-const adapters = ['.cursorrules', 'CLAUDE.md', 'GEMINI.md'];
-console.log(`${COLORS.cyan}${COLORS.bold}[L1: ADAPTERS]${COLORS.reset}`);
-let foundAdapters = false;
-adapters.forEach(a => {
-    const p = path.join(cwd, a);
-    if (fs.existsSync(p)) {
-        foundAdapters = true;
-        const content = fs.readFileSync(p, 'utf8');
-        const pointsTo = content.includes('.ai-context-os') ? '.ai-context-os' : (content.includes('.local-os') ? '.local-os' : 'CORE/DIRECT');
-        console.log(`${COLORS.green}  ✔ ${a.padEnd(12)}${COLORS.reset} -> ${pointsTo}`);
+    if (found) {
+        console.log(`  Path     : ${kPath}`);
+        console.log(`  Status   : FOUND\n`);
     } else {
-        console.log(`${COLORS.yellow}  - ${a.padEnd(12)}${COLORS.reset} NOT FOUND`);
+        console.log(`  Status   : MISSING!\n`);
     }
-});
-if (!foundAdapters) console.log(`  (No active adapters in current directory)`);
-console.log('');
 
-// 4. L2 Skills
-let skillsDir = null;
-if (activeOsDir) {
-    skillsDir = path.join(cwd, activeOsDir, 'skills');
-} else if (fs.existsSync(path.join(cwd, 'skills'))) {
-    skillsDir = path.join(cwd, 'skills');
-}
+    console.log(`${COLORS.cyan}${COLORS.bold}[L1: ADAPTERS]${COLORS.reset}`);
+    engine.getAdapterStatus().forEach(a => {
+        if (a.found) {
+            console.log(`${COLORS.green}  ✔ ${a.name.padEnd(12)}${COLORS.reset} -> ${a.pointsTo}`);
+        } else {
+            console.log(`${COLORS.yellow}  - ${a.name.padEnd(12)}${COLORS.reset} NOT FOUND`);
+        }
+    });
+    console.log('');
 
-console.log(`${COLORS.cyan}${COLORS.bold}[L2: SKILLS]${COLORS.reset}`);
-if (skillsDir && fs.existsSync(skillsDir)) {
-    const files = fs.readdirSync(skillsDir).filter(f => f.endsWith('.md') && f !== 'README.md');
-    if (files.length > 0) {
-        files.forEach(f => {
-            console.log(`${COLORS.green}  ★ ${f.replace('.md', '')}${COLORS.reset}`);
-        });
+    const skills = engine.getSkills(activeOsDir);
+    console.log(`${COLORS.cyan}${COLORS.bold}[L2: SKILLS]${COLORS.reset}`);
+    if (skills.length > 0) {
+        skills.forEach(s => console.log(`${COLORS.green}  ★ ${s}${COLORS.reset}`));
     } else {
-        console.log(`  (No modular skills found)`);
+        console.log(`  (No active skills found)`);
     }
-} else {
-    console.log(`  (Skills directory missing)`);
+    console.log('');
+    console.log(`${COLORS.blue}Use 'audit' to verify compliance with these rules.${COLORS.reset}\n`);
 }
-console.log('');
-
-console.log(`${COLORS.blue}Use 'audit' to verify compliance with these rules.${COLORS.reset}\n`);

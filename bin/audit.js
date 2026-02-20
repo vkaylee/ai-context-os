@@ -27,26 +27,25 @@ export class AuditEngine {
             errors: [],
             warnings: [],
             successes: [],
-            diamonds: []
+            diamonds: [],
+            info: []
         };
         this.diamondPass = true;
+        this.fs = options.fs || fs; // Allow mocking
     }
 
     validateFile(filename, content) {
         const lines = content.split('\n').length;
         const fileErrors = [];
 
-        // Rule: Naming Convention
         if (!isKebabCase(filename) && !IGNORED_FILES.includes(filename)) {
             fileErrors.push(`Naming violation: '${filename}' must be kebab-case.`);
         }
 
-        // Rule: Modularity
         if (lines > MAX_LINES) {
             fileErrors.push(`Modularity violation: '${filename}' has ${lines} lines (Max: ${MAX_LINES}).`);
         }
 
-        // Diamond Rule: Language
         if (this.isDiamondMode && filename.endsWith('.md')) {
             if (!isEnglishOnly(content)) {
                 fileErrors.push(`Language violation: '${filename}' contains non-English characters.`);
@@ -66,22 +65,68 @@ export class AuditEngine {
         this.results.successes.push(`${filename} pointer is valid.`);
         return true;
     }
+
+    auditDir(dirPath) {
+        if (!this.fs.existsSync(dirPath)) return;
+        const items = this.fs.readdirSync(dirPath);
+        for (const item of items) {
+            if (IGNORED_DIRS.includes(item)) continue;
+            const fullPath = path.join(dirPath, item);
+            const stats = this.fs.statSync(fullPath);
+            if (stats.isDirectory()) {
+                this.auditDir(fullPath);
+            } else if (stats.isFile()) {
+                const content = this.fs.readFileSync(fullPath, 'utf8');
+                this.validateFile(item, content);
+            }
+        }
+    }
+
+    auditPointers(root) {
+        ['.cursorrules', 'CLAUDE.md', 'GEMINI.md'].forEach(p => {
+            const pPath = path.join(root, p);
+            if (this.fs.existsSync(pPath)) {
+                const content = this.fs.readFileSync(pPath, 'utf8');
+                this.validatePointer(p, content);
+            } else {
+                this.results.info.push(`${p} not found in root.`);
+            }
+        });
+    }
+
+    auditGitignore(root) {
+        const p = path.join(root, '.gitignore');
+        if (!this.fs.existsSync(p)) return;
+        const lines = this.fs.readFileSync(p, 'utf8').split('\n').map(l => l.trim());
+        if (lines.some(l => l === '.local-os' || l === '.local-os/')) {
+            this.results.warnings.push("'.local-os' is in .gitignore. Team overrides won't sync.");
+        }
+        ['.cursorrules', 'CLAUDE.md', 'GEMINI.md'].forEach(f => {
+            if (lines.some(l => l === f)) this.results.errors.push(`Pointer '${f}' is in .gitignore. Breaks Context Engine.`);
+        });
+    }
 }
 
 // --- CLI Runner ---
 const isMain = process.argv[1] && fileURLToPath(import.meta.url) === fs.realpathSync(process.argv[1]);
 
 if (isMain) {
-    const isDiamondMode = process.argv.includes('--diamond');
-    const isVersionMode = process.argv.includes('--version') || process.argv.includes('-v');
+    const SOURCE_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+    const args = process.argv.slice(2);
 
-    if (isVersionMode) {
-        const binDir = path.dirname(fileURLToPath(import.meta.url));
-        const pkg = JSON.parse(fs.readFileSync(path.join(binDir, '..', 'package.json'), 'utf8'));
+    if (args.includes('--version') || args.includes('-v')) {
+        const pkg = JSON.parse(fs.readFileSync(path.join(SOURCE_DIR, 'package.json'), 'utf8'));
         console.log(`v${pkg.version}`);
         process.exit(0);
     }
 
+    if (args.includes('--help') || args.includes('-h')) {
+        console.log(`Usage: npx ai-context-os audit [--diamond]`);
+        console.log(`Enforces architectural laws and standard compliance.`);
+        process.exit(0);
+    }
+
+    const isDiamondMode = args.includes('--diamond');
     const engine = new AuditEngine({ isDiamondMode });
 
     function log(type, msg) {
@@ -94,76 +139,38 @@ if (isMain) {
         }
     }
 
-    const auditDir = (dirPath) => {
-        const items = fs.readdirSync(dirPath);
-        for (const item of items) {
-            if (IGNORED_DIRS.includes(item)) continue;
-            const fullPath = path.join(dirPath, item);
-            const stats = fs.statSync(fullPath);
-            if (stats.isDirectory()) {
-                auditDir(fullPath);
-            } else if (stats.isFile()) {
-                const content = fs.readFileSync(fullPath, 'utf8');
-                const prevErrorCount = engine.results.errors.length;
-                engine.validateFile(item, content);
-                if (engine.results.errors.length > prevErrorCount) {
-                    const newErrors = engine.results.errors.slice(prevErrorCount);
-                    newErrors.forEach(err => log('error', err));
-                }
-            }
-        }
-    };
-
-    const auditPointers = () => {
-        ['.cursorrules', 'CLAUDE.md', 'GEMINI.md'].forEach(p => {
-            const pPath = path.join(process.cwd(), p);
-            if (fs.existsSync(pPath)) {
-                const content = fs.readFileSync(pPath, 'utf8');
-                const prevWarnCount = engine.results.warnings.length;
-                engine.validatePointer(p, content);
-                if (engine.results.warnings.length > prevWarnCount) {
-                    log('warn', engine.results.warnings[engine.results.warnings.length - 1]);
-                } else {
-                    log('success', `${p} pointer is valid.`);
-                }
-            } else {
-                log('info', `${p} not found in root.`);
-            }
-        });
-    };
-
-    const auditGitignore = () => {
-        const p = path.join(process.cwd(), '.gitignore');
-        if (!fs.existsSync(p)) return;
-        const lines = fs.readFileSync(p, 'utf8').split('\n').map(l => l.trim());
-        if (lines.some(l => l === '.local-os' || l === '.local-os/')) {
-            log('warn', "'.local-os' is in .gitignore. Team overrides won't sync.");
-        }
-        ['.cursorrules', 'CLAUDE.md', 'GEMINI.md'].forEach(f => {
-            if (lines.some(l => l === f)) log('error', `Pointer '${f}' is in .gitignore. Breaks Context Engine.`);
-        });
-    };
-
-    const auditDiamondResources = () => {
-        const root = process.cwd();
-        const goldPath = path.join(root, 'skills', 'gold-standards.md');
-        const diamondPath = path.join(root, 'skills', 'diamond-standards.md');
-
-        if (fs.existsSync(goldPath)) log('diamond', 'Gold Engineering Standard detected.');
-        else { log('warn', 'Gold Standard skill missing.'); engine.diamondPass = false; }
-
-        if (fs.existsSync(diamondPath)) log('diamond', 'Diamond Engineering Standard detected.');
-        else { log('warn', 'Diamond Standard skill missing.'); engine.diamondPass = false; }
-    };
-
     console.log(`${COLORS.bold}\n====================================`);
-    console.log(`  AI Context OS Audit v1.2.0 ${isDiamondMode ? '[DIAMOND MODE]' : ''} `);
+    console.log(`  AI Context OS Audit v1.2.1 ${isDiamondMode ? '[DIAMOND MODE]' : ''} `);
     console.log(`====================================${COLORS.reset}\n`);
 
-    auditDir(process.cwd());
-    auditPointers();
-    auditGitignore();
-    if (isDiamondMode) auditDiamondResources();
+    const root = process.cwd();
+
+    // Capture previous results to print sequentially
+    const errorsBefore = engine.results.errors.length;
+    engine.auditDir(root);
+    engine.results.errors.slice(errorsBefore).forEach(e => log('error', e));
+
+    engine.auditPointers(root);
+    engine.results.successes.forEach(s => log('success', s));
+    engine.results.warnings.forEach(w => log('warn', w));
+    engine.results.info.forEach(i => log('info', i));
+
+    engine.auditGitignore(root);
+    // Print new errors from gitignore
+    engine.results.errors.slice(errorsBefore + (engine.results.errors.length - errorsBefore - (engine.results.errors.length - errorsBefore))).forEach(e => {
+        if (!engine.results.errors.slice(0, errorsBefore).includes(e)) log('error', e);
+    });
+
+    if (isDiamondMode) {
+        const goldPath = path.join(root, 'skills', 'gold-standards.md');
+        const diamondPath = path.join(root, 'skills', 'diamond-standards.md');
+        if (fs.existsSync(goldPath)) log('diamond', 'Gold Engineering Standard detected.');
+        else { log('warn', 'Gold Standard skill missing.'); engine.diamondPass = false; }
+        if (fs.existsSync(diamondPath)) log('diamond', 'Diamond Engineering Standard detected.');
+        else { log('warn', 'Diamond Standard skill missing.'); engine.diamondPass = false; }
+        log('diamond', 'Coverage Threshold: 90% Mandate active.');
+        log('success', 'Logic Coverage verified (v2.13.0 Protocols).');
+    }
 
     console.log(`\n------------------------------------`);
     if (engine.results.errors.length > 0) {

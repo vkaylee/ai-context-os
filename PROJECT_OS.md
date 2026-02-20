@@ -54,7 +54,7 @@ Before writing any code, every AI agent must:
 - **Modularity**: Files must not exceed **200 lines**. Refactor immediately if they do.
 - **Naming**: Use `kebab-case` for all files and directories.
 - **Language**: ALL documentation (`*.md`) must be written in **English** to ensure universal AI compatibility and minimize translation resource overhead.
-- **Testing**: No code is committed without passing tests. If skipping new tests, a clear justification must be provided. Every change requires a full execution of the project's regression suite to ensure zero regressions.
+- **Testing**: No code is committed without passing tests. If skipping new tests, a clear justification must be provided. Every change requires a full execution of the project's regression suite to ensure zero regressions. **Diamond Requirement**: Combined test coverage must exceed **90%**.
 - **Documentation**: All architectural and logic changes must be documented immediately. No documentation drift is permitted.
 
 ### 3.4 Engineering Benchmarks

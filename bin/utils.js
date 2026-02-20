@@ -4,6 +4,7 @@ export const COLORS = {
     green: '\x1b[32m',
     yellow: '\x1b[33m',
     cyan: '\x1b[36m',
+    blue: '\x1b[34m',
     bold: '\x1b[1m'
 };
 

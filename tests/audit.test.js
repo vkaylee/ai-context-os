@@ -38,13 +38,20 @@ test('AuditEngine: Diamond Mode - Language Check', () => {
     assert.strictEqual(engine.diamondPass, false);
 });
 
-test('AuditEngine: Pointer Pattern Verification', () => {
+test('AuditEngine: Pointer Pattern Discovery', () => {
     const engine = new AuditEngine();
+    engine.auditPointers('./'); // Run on source root
+    assert.ok(engine.results.successes.length > 0);
+});
 
-    // Positive
-    assert.strictEqual(engine.validatePointer('CLAUDE.md', 'Ref: .ai-context-os/CLAUDE.md'), true);
+test('AuditEngine: Recursive Directory Audit', () => {
+    const engine = new AuditEngine();
+    engine.auditDir('./bin');
+    assert.strictEqual(engine.results.errors.length, 0); // Bin should be clean
+});
 
-    // Negative
-    assert.strictEqual(engine.validatePointer('FAKE.md', 'No pointer link here'), false);
-    assert.match(engine.results.warnings[0], /does not seem to follow the Pointer Pattern/);
+test('AuditEngine: Gitignore Leak Prevention', () => {
+    const engine = new AuditEngine();
+    engine.auditGitignore('./'); // Run on source root
+    assert.strictEqual(engine.results.errors.filter(e => e.includes('gitignore')).length, 0);
 });

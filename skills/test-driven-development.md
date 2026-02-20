@@ -21,3 +21,11 @@
 ## 4. Regression Assurance
 - **Full Suite Mandate**: After passing new tests, AI agents MUST rerun the *entire* existing test suite (e.g., `npm test`) to ensure no side effects were introduced.
 - **Verification Proof**: Completion of a task requires evidence that the full regression suite passed in the current state.
+
+## 5. Mutation Thinking
+- **Verifiability**: A test is only as good as its ability to fail. If you change a `>=` to a `>` in your logic and the tests still pass, your tests are weak.
+- **Protocol**: Periodically "break" your own code (Manual Mutation) to verify your tests are actually catching logic errors.
+
+## 6. Coverage Guardrails
+- **Threshold**: Diamond-grade releases require **> 90%** logic coverage.
+- **Usage**: Run `npm run test:unit` to view the coverage report. AI agents must aim for 100% "Instruction" and "Branch" coverage whenever possible.

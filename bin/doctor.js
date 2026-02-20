@@ -1,11 +1,24 @@
-#!/usr/bin/env node
-
-/**
- * AI Context OS - Doctor
- * Diagnostic tool for basic system environment checks.
- */
-
+import fs from 'fs';
+import path from 'path';
 import os from 'os';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const SOURCE_DIR = path.resolve(path.dirname(__filename), '..');
+
+const args = process.argv.slice(2);
+
+if (args.includes('--version') || args.includes('-v')) {
+    const pkg = JSON.parse(fs.readFileSync(path.join(SOURCE_DIR, 'package.json'), 'utf8'));
+    console.log(`v${pkg.version}`);
+    process.exit(0);
+}
+
+if (args.includes('--help') || args.includes('-h')) {
+    console.log(`Usage: npx ai-context-os doctor`);
+    console.log(`Diagnoses system environment for AI Context OS compatibility.`);
+    process.exit(0);
+}
 
 console.log("\n==============================");
 console.log("  AI Context OS - Doctor 🩺  ");
