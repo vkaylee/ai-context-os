@@ -61,7 +61,8 @@ console.log(`\n${colors.yellow}Copying core OS files...${colors.reset}`);
 const FILES_TO_COPY = [
     'PROJECT_OS.md',
     '.cursorrules',
-    'CLAUDE.md'
+    'CLAUDE.md',
+    'GEMINI.md'
 ];
 
 const DIRS_TO_COPY = [
@@ -121,11 +122,20 @@ Nếu dự án có thư mục custom như \`.local-os/\`, ưu tiên sử dụng 
 Tham chiếu AI adapter mặc định: \`.ai-context-os/CLAUDE.md\`
 `;
 
+const geminiContent = `# Pointer: GEMINI.md
+Đọc và tuân thủ toàn bộ hệ điều hành AI tại: \`.ai-context-os/PROJECT_OS.md\` và các skills tại \`.ai-context-os/skills/\`.
+Nếu dự án có thư mục custom như \`.local-os/\`, ưu tiên sử dụng \`.local-os/\` trước (Fallback Architecture).
+Tham chiếu AI adapter mặc định: \`.ai-context-os/GEMINI.md\`
+`;
+
 fs.writeFileSync(path.join(TARGET_DIR, '.cursorrules'), cursorrulesContent, 'utf8');
 console.log('  Created .cursorrules pointer.');
 
 fs.writeFileSync(path.join(TARGET_DIR, 'CLAUDE.md'), claudeContent, 'utf8');
 console.log('  Created CLAUDE.md pointer.');
+
+fs.writeFileSync(path.join(TARGET_DIR, 'GEMINI.md'), geminiContent, 'utf8');
+console.log('  Created GEMINI.md pointer.');
 
 console.log(`\n${colors.green}✅ Integration Complete!${colors.reset}`);
 console.log(`The AI Context OS has been installed in: ${OS_DIR}`);
@@ -133,4 +143,4 @@ console.log(`\n${colors.yellow}Next Steps:${colors.reset}`);
 console.log(`1. Navigate to your project: cd ${TARGET_DIR}`);
 console.log(`2. The AI will now automatically read from .ai-context-os/ via the pointer files.`);
 console.log(`3. To override rules, create your own local skills (e.g., in .local-os/skills/) rather than modifying the core OS files.`);
-console.log(`4. Reload your AI assistant (Cursor/Claude) window.\n`);
+console.log(`4. Reload your AI assistant (Cursor/Claude/Gemini) window.\n`);

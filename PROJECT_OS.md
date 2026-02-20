@@ -29,7 +29,7 @@ This OS operates on a **Fallback Architecture (Inheritance)**. AI agents must pr
 | Layer | Component | Function |
 | :--- | :--- | :--- |
 | **L0 (Kernel)** | `.ai-context-os/PROJECT_OS.md` | The immutable laws and standard configurations of the orchestrator. |
-| **L1 (Adapters)** | `.ai-context-os/CLAUDE.md`, `.ai-context-os/.cursorrules` | Translates L0 laws. Pointer files in project root reference these. |
+| **L1 (Adapters)** | `.ai-context-os/CLAUDE.md`, `.ai-context-os/.cursorrules`, `.ai-context-os/GEMINI.md` | Translates L0 laws. Pointer files in project root reference these. |
 | **L2 (Skills)** | `.ai-context-os/skills/` directory | Modular capabilities fallback (React, Rust, Python, etc.) |
 | **L3 (Docs)** | `.ai-context-os/docs/` directory | Human-readable context and decision logs. |
 
@@ -66,7 +66,7 @@ Before writing any code, every AI agent must:
 | Agent | Responsibility | Primary Instruction File |
 | :--- | :--- | :--- |
 | **Orchestrator** | High-level planning, architecture, and alignment. | `PROJECT_OS.md` |
-| **Implementer** | Writing code, tests, and documentation. | `CLAUDE.md` / `.cursorrules` |
+| **Implementer** | Writing code, tests, and documentation. | `CLAUDE.md` / `.cursorrules` / `GEMINI.md` |
 | **Reviewer** | Validating against L0 standards. | `docs/review-checklist.md` |
 
 ---

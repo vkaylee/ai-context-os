@@ -19,7 +19,7 @@ const COLORS = {
 
 const MAX_LINES = 200;
 const IGNORED_DIRS = ['node_modules', '.git', '.ai-context-os'];
-const IGNORED_FILES = ['package-lock.json', 'PROJECT_OS.md', 'README.md', 'CLAUDE.md'];
+const IGNORED_FILES = ['package-lock.json', 'PROJECT_OS.md', 'README.md', 'CLAUDE.md', 'GEMINI.md'];
 
 let errorCount = 0;
 let warningCount = 0;

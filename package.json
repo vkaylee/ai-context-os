@@ -1,6 +1,6 @@
 {
   "name": "ai-context-os",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "An installable LLM Orchestrator Framework for AI Agents (Cursor, Claude, etc.)",
   "bin": {
     "ai-context-os": "bin/install.js",
@@ -12,7 +12,8 @@
     "skills",
     "PROJECT_OS.md",
     ".cursorrules",
-    "CLAUDE.md"
+    "CLAUDE.md",
+    "GEMINI.md"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
