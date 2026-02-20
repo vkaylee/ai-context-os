@@ -26,6 +26,10 @@
 - **Verifiability**: A test is only as good as its ability to fail. If you change a `>=` to a `>` in your logic and the tests still pass, your tests are weak.
 - **Protocol**: Periodically "break" your own code (Manual Mutation) to verify your tests are actually catching logic errors.
 
+## 6. Exploratory Fuzzing
+- **Chaos Input**: Unit tests cover known unknowns. Fuzzing covers unknown unknowns.
+- **Protocol**: Inject "junk" parameters (random strings, null-like bytes, huge buffers) into the CLI to test resilience (Error Hardening). A Diamond-grade CLI must NEVER crash (Unhandled Exception); it must only report errors and exit safely.
+
 ## 6. Coverage Guardrails
 - **Threshold**: Diamond-grade releases require **> 90%** logic coverage.
 - **Usage**: Run `npm run test:unit` to view the coverage report. AI agents must aim for 100% "Instruction" and "Branch" coverage whenever possible.

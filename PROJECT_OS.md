@@ -55,6 +55,7 @@ Before writing any code, every AI agent must:
 - **Naming**: Use `kebab-case` for all files and directories.
 - **Language**: ALL documentation (`*.md`) must be written in **English** to ensure universal AI compatibility and minimize translation resource overhead.
 - **Type Safety**: Universal Rule. All functions, methods, and complex variables MUST have explicit input and output signatures. For JS/Python, use strict docstrings JSDoc `// @ts-check` or PEP 484 type hints. Zero-defect static linting is mandatory.
+- **Fuzzing**: All CLI input parsers MUST pass a 100-cycle randomized exploratory test (Fuzzing) to ensure zero unhandled exceptions from malformed data.
 - **Testing**: No code is committed without passing tests. If skipping new tests, a clear justification must be provided. Every change requires a full execution of the project's regression suite to ensure zero regressions. **Diamond Requirement**: Combined test coverage must exceed **90%**.
 - **Documentation**: All architectural and logic changes must be documented immediately. No documentation drift is permitted.
 
