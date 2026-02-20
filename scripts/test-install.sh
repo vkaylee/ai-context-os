@@ -29,9 +29,6 @@ echo -e "\n3. Verifying Deployment..."
 
 CHECK_FILES=(
     ".ai-context-os/PROJECT_OS.md"
-    ".ai-context-os/.cursorrules"
-    ".ai-context-os/CLAUDE.md"
-    ".ai-context-os/GEMINI.md"
     ".ai-context-os/skills/README.md"
     ".cursorrules"
     "CLAUDE.md"

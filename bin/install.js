@@ -59,10 +59,7 @@ fs.mkdirSync(OS_DIR, { recursive: true });
 console.log(`\n${colors.yellow}Copying core OS files...${colors.reset}`);
 
 const FILES_TO_COPY = [
-    'PROJECT_OS.md',
-    '.cursorrules',
-    'CLAUDE.md',
-    'GEMINI.md'
+    'PROJECT_OS.md'
 ];
 
 const DIRS_TO_COPY = [
@@ -108,25 +105,11 @@ for (const dir of DIRS_TO_COPY) {
     }
 }
 
-console.log(`\n${colors.yellow}Creating Pointer Files in root...${colors.reset}`);
+console.log(`\n${colors.yellow}Generating Root Adapters...${colors.reset}`);
 
-const cursorrulesContent = `# Pointer: .cursorrules
-Read and adhere to the entire AI Operating System at: \`.ai-context-os/PROJECT_OS.md\` and skills at \`.ai-context-os/skills/\`.
-If the project has a custom directory like \`.local-os/\`, prioritize using \`.local-os/\` first (Fallback Architecture).
-Default AI adapter reference: \`.ai-context-os/.cursorrules\`
-`;
-
-const claudeContent = `# Pointer: CLAUDE.md
-Read and adhere to the entire AI Operating System at: \`.ai-context-os/PROJECT_OS.md\` and skills at \`.ai-context-os/skills/\`.
-If the project has a custom directory like \`.local-os/\`, prioritize using \`.local-os/\` first (Fallback Architecture).
-Default AI adapter reference: \`.ai-context-os/CLAUDE.md\`
-`;
-
-const geminiContent = `# Pointer: GEMINI.md
-Read and adhere to the entire AI Operating System at: \`.ai-context-os/PROJECT_OS.md\` and skills at \`.ai-context-os/skills/\`.
-If the project has a custom directory like \`.local-os/\`, prioritize using \`.local-os/\` first (Fallback Architecture).
-Default AI adapter reference: \`.ai-context-os/GEMINI.md\`
-`;
+const cursorrulesContent = fs.readFileSync(path.join(SOURCE_DIR, 'adapter-cursor.md'), 'utf8');
+const claudeContent = fs.readFileSync(path.join(SOURCE_DIR, 'adapter-claude.md'), 'utf8');
+const geminiContent = fs.readFileSync(path.join(SOURCE_DIR, 'adapter-gemini.md'), 'utf8');
 
 let isSelfInstall = false;
 try {
@@ -143,16 +126,16 @@ try {
 
 if (isSelfInstall) {
     console.log(`  ${colors.cyan}[Dogfooding Mode] Target is 'ai-context-os' source repo.${colors.reset}`);
-    console.log(`  Skipping pointer file generation to protect source L1 Adapters.`);
+    console.log(`  Skipping adapter file generation to protect source repo.`);
 } else {
     fs.writeFileSync(path.join(TARGET_DIR, '.cursorrules'), cursorrulesContent, 'utf8');
-    console.log('  Created .cursorrules pointer.');
+    console.log('  Generated .cursorrules adapter.');
 
     fs.writeFileSync(path.join(TARGET_DIR, 'CLAUDE.md'), claudeContent, 'utf8');
-    console.log('  Created CLAUDE.md pointer.');
+    console.log('  Generated CLAUDE.md adapter.');
 
     fs.writeFileSync(path.join(TARGET_DIR, 'GEMINI.md'), geminiContent, 'utf8');
-    console.log('  Created GEMINI.md pointer.');
+    console.log('  Generated GEMINI.md adapter.');
 }
 
 const gitignorePath = path.join(TARGET_DIR, '.gitignore');
