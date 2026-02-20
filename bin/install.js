@@ -128,14 +128,32 @@ If the project has a custom directory like \`.local-os/\`, prioritize using \`.l
 Default AI adapter reference: \`.ai-context-os/GEMINI.md\`
 `;
 
-fs.writeFileSync(path.join(TARGET_DIR, '.cursorrules'), cursorrulesContent, 'utf8');
-console.log('  Created .cursorrules pointer.');
+let isSelfInstall = false;
+try {
+    const targetPkgPath = path.join(TARGET_DIR, 'package.json');
+    if (fs.existsSync(targetPkgPath)) {
+        const targetPkg = JSON.parse(fs.readFileSync(targetPkgPath, 'utf8'));
+        if (targetPkg.name === 'ai-context-os') {
+            isSelfInstall = true;
+        }
+    }
+} catch (e) {
+    // Ignore errors
+}
 
-fs.writeFileSync(path.join(TARGET_DIR, 'CLAUDE.md'), claudeContent, 'utf8');
-console.log('  Created CLAUDE.md pointer.');
+if (isSelfInstall) {
+    console.log(`  ${colors.cyan}[Dogfooding Mode] Target is 'ai-context-os' source repo.${colors.reset}`);
+    console.log(`  Skipping pointer file generation to protect source L1 Adapters.`);
+} else {
+    fs.writeFileSync(path.join(TARGET_DIR, '.cursorrules'), cursorrulesContent, 'utf8');
+    console.log('  Created .cursorrules pointer.');
 
-fs.writeFileSync(path.join(TARGET_DIR, 'GEMINI.md'), geminiContent, 'utf8');
-console.log('  Created GEMINI.md pointer.');
+    fs.writeFileSync(path.join(TARGET_DIR, 'CLAUDE.md'), claudeContent, 'utf8');
+    console.log('  Created CLAUDE.md pointer.');
+
+    fs.writeFileSync(path.join(TARGET_DIR, 'GEMINI.md'), geminiContent, 'utf8');
+    console.log('  Created GEMINI.md pointer.');
+}
 
 console.log(`\n${colors.green}✅ Integration Complete!${colors.reset}`);
 console.log(`The AI Context OS has been installed in: ${OS_DIR}`);
