@@ -22,6 +22,11 @@ const COMMANDS = {
         script: 'audit.js',
         usage: 'audit [--diamond]'
     },
+    'doctor': {
+        description: 'Run system diagnostics for the OS',
+        script: 'doctor.js',
+        usage: 'doctor'
+    },
     'version': {
         description: 'Show current CLI version',
         usage: '-v, --version'
