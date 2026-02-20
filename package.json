@@ -16,7 +16,7 @@
     "GEMINI.md"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node bin/audit.js --diamond && ./scripts/test-install.sh"
   },
   "keywords": [
     "ai",
