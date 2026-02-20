@@ -55,7 +55,9 @@ Before writing any code, every AI agent must:
 - **Language**: ALL documentation (`*.md`) must be written in **English** to ensure universal AI compatibility and minimize translation resource overhead.
 - **Testing**: No code is committed without passing tests.
 
-### 3.3 Tech Stack Constraints (Example)
+### 3.4 Engineering Benchmarks
+- **🥇 Gold Standard**: Mandatory for all production features. Includes audit compliance, English docs, and modularity.
+- **💎 Diamond Standard**: The ultimate goal. Includes predictive self-healing, architectural purity, and zero technical debt. Agents are encouraged to self-elect to Diamond mode for complex refactors.
 - **Containerization**: ALL meaningful execution happens inside Docker.
 - **Language**: [Define your primary languages here, e.g., TypeScript, Rust]
 - **Style**: [Define your style guide, e.g., Prettier, Rustfmt]
